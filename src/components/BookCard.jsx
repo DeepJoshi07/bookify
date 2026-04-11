@@ -1,14 +1,6 @@
-import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
-import type { Book } from "@/types";
 
-type Props = {
-  book: Book;
-  showStatus?: boolean;
-  actions?: ReactNode;
-};
-
-export function BookCard({ book, showStatus, actions }: Props) {
+export function BookCard({ book, showStatus, actions }) {
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-card transition hover:-translate-y-0.5 hover:shadow-lg dark:bg-ink-800 dark:shadow-card-dark">
       <Link

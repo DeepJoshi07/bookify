@@ -1,10 +1,10 @@
 import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
-import { useBooks } from "@/context/BooksContext";
+import { useAuth } from "@/context/AuthContext.jsx";
+import { useBooks } from "@/context/BooksContext.jsx";
 
 export function OrderDetailPage() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const { user } = useAuth();
   const { orders, getBook } = useBooks();
 

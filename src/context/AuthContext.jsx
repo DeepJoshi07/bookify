@@ -4,20 +4,11 @@ import {
   useContext,
   useMemo,
   useState,
-  type ReactNode,
 } from "react";
-import type { User } from "@/types";
 
-type AuthContextValue = {
-  user: User | null;
-  login: (email: string, password: string) => void;
-  signup: (name: string, email: string, password: string) => void;
-  logout: () => void;
-};
+const AuthContext = createContext(null);
 
-const AuthContext = createContext<AuthContextValue | null>(null);
-
-function makeUser(name: string, email: string): User {
+function makeUser(name, email) {
   return {
     id: `user-${email.replace(/[^a-z0-9]/gi, "-")}`,
     name,
@@ -26,16 +17,16 @@ function makeUser(name: string, email: string): User {
   };
 }
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
 
-  const login = useCallback((email: string, _password: string) => {
+  const login = useCallback((email, _password) => {
     void _password;
     const name = email.split("@")[0]?.replace(/\./g, " ") ?? "Reader";
     setUser(makeUser(name, email));
   }, []);
 
-  const signup = useCallback((name: string, email: string, _password: string) => {
+  const signup = useCallback((name, email, _password) => {
     void _password;
     setUser(makeUser(name.trim() || "Reader", email));
   }, []);

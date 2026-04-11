@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
-import { BookCard } from "@/components/BookCard";
-import { EmptyState } from "@/components/EmptyState";
-import { useBooks } from "@/context/BooksContext";
+import { BookCard } from "@/components/BookCard.jsx";
+import { EmptyState } from "@/components/EmptyState.jsx";
+import { useBooks } from "@/context/BooksContext.jsx";
 
 export function BrowsePage() {
   const { books } = useBooks();
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState<"all" | "available" | "sold">("available");
+  const [status, setStatus] = useState("available");
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -52,7 +52,7 @@ export function BrowsePage() {
           <select
             id="browse-status"
             value={status}
-            onChange={(e) => setStatus(e.target.value as typeof status)}
+            onChange={(e) => setStatus(e.target.value)}
             className="focus-ring mt-1 rounded-xl border border-paper-200 bg-white px-4 py-3 dark:border-ink-600 dark:bg-ink-800 dark:text-paper-50"
           >
             <option value="available">Available</option>

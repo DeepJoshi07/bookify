@@ -1,9 +1,9 @@
 import { Link, NavLink } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
-import { useTheme } from "@/context/ThemeContext";
+import { useAuth } from "@/context/AuthContext.jsx";
+import { useTheme } from "@/context/ThemeContext.jsx";
 import { useState } from "react";
 
-const navClass = ({ isActive }: { isActive: boolean }) =>
+const navClass = ({ isActive }) =>
   `rounded-lg px-3 py-2 text-sm font-medium transition focus-ring ${
     isActive
       ? "bg-paper-200 text-ink-900 dark:bg-ink-700 dark:text-paper-50"

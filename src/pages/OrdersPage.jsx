@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import { EmptyState } from "@/components/EmptyState";
-import { useAuth } from "@/context/AuthContext";
-import { useBooks } from "@/context/BooksContext";
-import { useToast } from "@/context/ToastContext";
+import { EmptyState } from "@/components/EmptyState.jsx";
+import { useAuth } from "@/context/AuthContext.jsx";
+import { useBooks } from "@/context/BooksContext.jsx";
+import { useToast } from "@/context/ToastContext.jsx";
 
 export function OrdersPage() {
   const { user } = useAuth();

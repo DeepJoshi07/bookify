@@ -1,10 +1,4 @@
-type Props = {
-  title: string;
-  description?: string;
-  action?: React.ReactNode;
-};
-
-export function EmptyState({ title, description, action }: Props) {
+export function EmptyState({ title, description, action }) {
   return (
     <div
       className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-paper-200 bg-white/60 px-8 py-16 text-center dark:border-ink-700 dark:bg-ink-800/40"

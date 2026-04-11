@@ -1,8 +1,6 @@
-import type { Book } from "@/types";
-
 const demoSellerId = "user-demo-1";
 
-export const seedBooks: Book[] = [
+export const seedBooks = [
   {
     id: "b1",
     title: "The Design of Everyday Things",

@@ -1,25 +1,10 @@
-import {
-  useEffect,
-  useState,
-  type ChangeEvent,
-  type FormEvent,
-} from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
-import { useBooks } from "@/context/BooksContext";
-import { useToast } from "@/context/ToastContext";
+import { useAuth } from "@/context/AuthContext.jsx";
+import { useBooks } from "@/context/BooksContext.jsx";
+import { useToast } from "@/context/ToastContext.jsx";
 
-type FormState = {
-  title: string;
-  isbn: string;
-  author: string;
-  email: string;
-  price: string;
-  coverUrl: string;
-  description: string;
-};
-
-const empty: FormState = {
+const empty = {
   title: "",
   isbn: "",
   author: "",
@@ -29,8 +14,8 @@ const empty: FormState = {
   description: "",
 };
 
-function validate(f: FormState, userEmail: string) {
-  const e: Partial<Record<keyof FormState, string>> = {};
+function validate(f, userEmail) {
+  const e = {};
   if (!f.title.trim()) e.title = "Book name is required.";
   if (!f.isbn.trim()) e.isbn = "ISBN is required.";
   else if (!/^[\d\-Xx]{10,17}$/.test(f.isbn.replace(/\s/g, "")))
@@ -53,16 +38,16 @@ function validate(f: FormState, userEmail: string) {
 }
 
 export function AddEditListingPage() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const isEdit = Boolean(id);
   const { user } = useAuth();
   const { getBook, addBook, updateBook } = useBooks();
   const { pushToast } = useToast();
   const navigate = useNavigate();
 
-  const [form, setForm] = useState<FormState>(empty);
-  const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
-  const [fileName, setFileName] = useState<string | null>(null);
+  const [form, setForm] = useState(empty);
+  const [errors, setErrors] = useState({});
+  const [fileName, setFileName] = useState(null);
 
   useEffect(() => {
     if (!id || !user) return;
@@ -82,7 +67,7 @@ export function AddEditListingPage() {
     });
   }, [id, user, getBook, navigate]);
 
-  function handleFile(ev: ChangeEvent<HTMLInputElement>) {
+  function handleFile(ev) {
     const file = ev.target.files?.[0];
     if (!file) return;
     setFileName(file.name);
@@ -96,7 +81,7 @@ export function AddEditListingPage() {
     reader.readAsDataURL(file);
   }
 
-  function handleSubmit(ev: FormEvent) {
+  function handleSubmit(ev) {
     ev.preventDefault();
     if (!user) return;
     const next = validate(form, user.email);
@@ -273,14 +258,6 @@ function Field({
   error,
   hint,
   type = "text",
-}: {
-  label: string;
-  id: string;
-  value: string;
-  onChange: (v: string) => void;
-  error?: string;
-  hint?: string;
-  type?: string;
 }) {
   return (
     <div>

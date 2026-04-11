@@ -1,9 +1,9 @@
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext.jsx";
 
-function validate(email: string, password: string) {
-  const e: Record<string, string> = {};
+function validate(email, password) {
+  const e = {};
   if (!email.trim()) e.email = "Email is required.";
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = "Enter a valid email.";
   if (!password) e.password = "Password is required.";
@@ -15,13 +15,13 @@ export function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = (location.state as { from?: string } | null)?.from ?? "/";
+  const from = (location.state?.from) ?? "/";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState({});
 
-  function handleSubmit(ev: FormEvent) {
+  function handleSubmit(ev) {
     ev.preventDefault();
     const next = validate(email, password);
     setErrors(next);

@@ -1,9 +1,9 @@
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext.jsx";
 
-function validate(name: string, email: string, password: string, confirm: string) {
-  const e: Record<string, string> = {};
+function validate(name, email, password, confirm) {
+  const e = {};
   if (!name.trim()) e.name = "Name is required.";
   if (!email.trim()) e.email = "Email is required.";
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = "Enter a valid email.";
@@ -20,9 +20,9 @@ export function SignupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState({});
 
-  function handleSubmit(ev: FormEvent) {
+  function handleSubmit(ev) {
     ev.preventDefault();
     const next = validate(name, email, password, confirm);
     setErrors(next);

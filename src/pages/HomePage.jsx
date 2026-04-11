@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { BookCard } from "@/components/BookCard";
-import { useBooks } from "@/context/BooksContext";
+import { BookCard } from "@/components/BookCard.jsx";
+import { useBooks } from "@/context/BooksContext.jsx";
 import hero from "../assets/hero.png";
 
 export function HomePage() {

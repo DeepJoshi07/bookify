@@ -1,16 +1,16 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { MainLayout } from "@/layouts/MainLayout";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { AddEditListingPage } from "@/pages/AddEditListingPage";
-import { BookDetailPage } from "@/pages/BookDetailPage";
-import { BrowsePage } from "@/pages/BrowsePage";
-import { HomePage } from "@/pages/HomePage";
-import { ListingsPage } from "@/pages/ListingsPage";
-import { LoginPage } from "@/pages/LoginPage";
-import { NotFoundPage } from "@/pages/NotFoundPage";
-import { OrderDetailPage } from "@/pages/OrderDetailPage";
-import { OrdersPage } from "@/pages/OrdersPage";
-import { SignupPage } from "@/pages/SignupPage";
+import { MainLayout } from "@/layouts/MainLayout.jsx";
+import { ProtectedRoute } from "@/components/ProtectedRoute.jsx";
+import { AddEditListingPage } from "@/pages/AddEditListingPage.jsx";
+import { BookDetailPage } from "@/pages/BookDetailPage.jsx";
+import { BrowsePage } from "@/pages/BrowsePage.jsx";
+import { HomePage } from "@/pages/HomePage.jsx";
+import { ListingsPage } from "@/pages/ListingsPage.jsx";
+import { LoginPage } from "@/pages/LoginPage.jsx";
+import { NotFoundPage } from "@/pages/NotFoundPage.jsx";
+import { OrderDetailPage } from "@/pages/OrderDetailPage.jsx";
+import { OrdersPage } from "@/pages/OrdersPage.jsx";
+import { SignupPage } from "@/pages/SignupPage.jsx";
 
 export default function App() {
   return (

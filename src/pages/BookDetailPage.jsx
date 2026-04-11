@@ -1,13 +1,13 @@
 import { useMemo } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { BookCard } from "@/components/BookCard";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { useAuth } from "@/context/AuthContext";
-import { useBooks } from "@/context/BooksContext";
-import { useToast } from "@/context/ToastContext";
+import { BookCard } from "@/components/BookCard.jsx";
+import { LoadingSpinner } from "@/components/LoadingSpinner.jsx";
+import { useAuth } from "@/context/AuthContext.jsx";
+import { useBooks } from "@/context/BooksContext.jsx";
+import { useToast } from "@/context/ToastContext.jsx";
 
 export function BookDetailPage() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const { getBook, relatedBooks, purchaseBook } = useBooks();
   const { user } = useAuth();
   const { pushToast } = useToast();

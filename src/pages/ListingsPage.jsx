@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import { BookCard } from "@/components/BookCard";
-import { EmptyState } from "@/components/EmptyState";
-import { useAuth } from "@/context/AuthContext";
-import { useBooks } from "@/context/BooksContext";
-import { useToast } from "@/context/ToastContext";
+import { BookCard } from "@/components/BookCard.jsx";
+import { EmptyState } from "@/components/EmptyState.jsx";
+import { useAuth } from "@/context/AuthContext.jsx";
+import { useBooks } from "@/context/BooksContext.jsx";
+import { useToast } from "@/context/ToastContext.jsx";
 
 export function ListingsPage() {
   const { user } = useAuth();
@@ -65,7 +65,7 @@ export function ListingsPage() {
                     type="button"
                     className="focus-ring rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700 dark:border-red-900 dark:text-red-300"
                     onClick={() => {
-                      if (confirm(`Delete “${book.title}”?`)) {
+                      if (confirm(`Delete "${book.title}"?`)) {
                         deleteBook(book.id);
                         pushToast("Listing removed.", "success");
                       }

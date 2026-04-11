@@ -4,23 +4,14 @@ import {
   useContext,
   useMemo,
   useState,
-  type ReactNode,
 } from "react";
 
-export type Toast = { id: string; message: string; type?: "success" | "error" };
+const ToastContext = createContext(null);
 
-type ToastContextValue = {
-  toasts: Toast[];
-  pushToast: (message: string, type?: Toast["type"]) => void;
-  dismiss: (id: string) => void;
-};
+export function ToastProvider({ children }) {
+  const [toasts, setToasts] = useState([]);
 
-const ToastContext = createContext<ToastContextValue | null>(null);
-
-export function ToastProvider({ children }: { children: ReactNode }) {
-  const [toasts, setToasts] = useState<Toast[]>([]);
-
-  const pushToast = useCallback((message: string, type?: Toast["type"]) => {
+  const pushToast = useCallback((message, type) => {
     const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     setToasts((prev) => [...prev, { id, message, type }]);
     window.setTimeout(() => {
@@ -28,7 +19,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     }, 4000);
   }, []);
 
-  const dismiss = useCallback((id: string) => {
+  const dismiss = useCallback((id) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
