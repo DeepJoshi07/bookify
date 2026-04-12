@@ -1,6 +1,6 @@
 const demoSellerId = "user-demo-1";
 
-export const seedBooks = [
+export const seededBooks = [
   {
     id: "b1",
     title: "The Design of Everyday Things",
@@ -10,7 +10,7 @@ export const seedBooks = [
     price: 18.99,
     description:
       "A classic on usability and human-centered design. Essential for anyone building products people use.",
-    coverUrl:
+    coverImage:
       "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&h=600&fit=crop",
     sellerId: demoSellerId,
     status: "available",
@@ -24,7 +24,7 @@ export const seedBooks = [
     price: 14.5,
     description:
       "A lone astronaut races to save Earth in this thrilling science fiction adventure.",
-    coverUrl:
+    coverImage:
       "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400&h=600&fit=crop",
     sellerId: "user-other",
     status: "available",
@@ -38,7 +38,7 @@ export const seedBooks = [
     price: 21.0,
     description:
       "Tiny changes, remarkable results — a practical guide to building good habits.",
-    coverUrl:
+    coverImage:
       "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=400&h=600&fit=crop",
     sellerId: "user-other",
     status: "available",
@@ -52,7 +52,7 @@ export const seedBooks = [
     price: 12.99,
     description:
       "Epic science fiction set on the desert planet Arrakis. A masterpiece of world-building.",
-    coverUrl:
+    coverImage:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=600&fit=crop",
     sellerId: "user-other",
     status: "sold",

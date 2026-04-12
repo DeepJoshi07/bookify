@@ -1,8 +1,10 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext.jsx";
+
+import { useFirebase } from "../context/Firebase";
 
 export function ProtectedRoute({ children }) {
-  const { user } = useAuth();
+
+  const {user} = useFirebase();
   const location = useLocation();
 
   if (!user) {

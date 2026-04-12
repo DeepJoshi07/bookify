@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext.jsx";
 import { useBooks } from "@/context/BooksContext.jsx";
+import { useFirebase } from "../context/Firebase";
 
 export function OrderDetailPage() {
   const { id } = useParams();
-  const { user } = useAuth();
+  const { user } = useFirebase();
   const { orders, getBook } = useBooks();
 
   const order = useMemo(

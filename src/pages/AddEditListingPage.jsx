@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext.jsx";
 import { useBooks } from "@/context/BooksContext.jsx";
 import { useToast } from "@/context/ToastContext.jsx";
+import { useFirebase } from "../context/Firebase";
 
 const empty = {
   title: "",
@@ -10,7 +10,7 @@ const empty = {
   author: "",
   email: "",
   price: "",
-  coverUrl: "",
+  coverImage: "",
   description: "",
 };
 
@@ -25,12 +25,12 @@ function validate(f, userEmail) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) e.email = "Enter a valid email.";
   const p = parseFloat(f.price);
   if (Number.isNaN(p) || p <= 0) e.price = "Enter a valid price.";
-  if (!f.coverUrl.trim()) e.coverUrl = "Cover image URL is required.";
+  if (!f.coverImage.trim()) e.coverImage = "Cover image URL is required.";
   else {
     try {
-      new URL(f.coverUrl);
+      new URL(f.coverImage);
     } catch {
-      e.coverUrl = "Enter a valid image URL.";
+      e.coverImage = "Enter a valid image URL.";
     }
   }
   if (!f.description.trim()) e.description = "Description is required.";
@@ -40,7 +40,7 @@ function validate(f, userEmail) {
 export function AddEditListingPage() {
   const { id } = useParams();
   const isEdit = Boolean(id);
-  const { user } = useAuth();
+  const {user} = useFirebase();
   const { getBook, addBook, updateBook } = useBooks();
   const { pushToast } = useToast();
   const navigate = useNavigate();
@@ -62,7 +62,7 @@ export function AddEditListingPage() {
       author: book.author,
       email: book.sellerEmail,
       price: String(book.price),
-      coverUrl: book.coverUrl,
+      coverImage: book.coverImage,
       description: book.description,
     });
   }, [id, user, getBook, navigate]);
@@ -71,14 +71,12 @@ export function AddEditListingPage() {
     const file = ev.target.files?.[0];
     if (!file) return;
     setFileName(file.name);
-    const reader = new FileReader();
-    reader.onload = () => {
-      const r = reader.result;
-      if (typeof r === "string") {
-        setForm((f) => ({ ...f, coverUrl: r }));
-      }
-    };
-    reader.readAsDataURL(file);
+    setForm(p => ({...p,coverImage:file}))
+    // const reader = new FileReader();
+    // reader.onload = (e) => {
+    //   setForm((f) => ({ ...f, coverImage: e.target.result }));
+    // };
+    // reader.readAsDataURL(file);
   }
 
   function handleSubmit(ev) {
@@ -98,7 +96,7 @@ export function AddEditListingPage() {
         author: form.author.trim(),
         sellerEmail,
         price,
-        coverUrl: form.coverUrl.trim(),
+        coverImage: form.coverImage.trim(),
         description: form.description.trim(),
       });
       pushToast("Listing updated.", "success");
@@ -109,7 +107,7 @@ export function AddEditListingPage() {
         author: form.author.trim(),
         sellerEmail,
         price,
-        coverUrl: form.coverUrl.trim(),
+        coverImage: form.coverImage.trim(),
         description: form.description.trim(),
         sellerId: user.id,
       });
@@ -123,9 +121,6 @@ export function AddEditListingPage() {
       <h1 className="font-display text-3xl font-bold text-ink-900 dark:text-paper-50">
         {isEdit ? "Edit listing" : "Add listing"}
       </h1>
-      <p className="mt-2 text-sm text-ink-700 dark:text-paper-300">
-        Demo only — data is saved in your browser.
-      </p>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-5" noValidate>
         <Field
@@ -184,7 +179,7 @@ export function AddEditListingPage() {
             Cover image
           </span>
           <p className="mt-1 text-xs text-ink-600 dark:text-paper-400">
-            Upload a file (stored as data URL) or paste an image URL below.
+            Upload a file (stored as data URL) 
           </p>
           <input
             type="file"
@@ -196,22 +191,7 @@ export function AddEditListingPage() {
           {fileName ? (
             <p className="mt-1 text-xs text-ink-600">Selected: {fileName}</p>
           ) : null}
-          <label htmlFor="f-cover-url" className="mt-3 block text-xs font-medium text-ink-700 dark:text-paper-400">
-            Image URL
-          </label>
-          <input
-            id="f-cover-url"
-            value={form.coverUrl}
-            onChange={(e) => setForm((f) => ({ ...f, coverUrl: e.target.value }))}
-            placeholder="https://…"
-            className="focus-ring mt-1 w-full rounded-xl border border-paper-200 bg-white px-4 py-3 text-sm dark:border-ink-600 dark:bg-ink-800 dark:text-paper-50"
-            aria-invalid={!!errors.coverUrl}
-          />
-          {errors.coverUrl ? (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
-              {errors.coverUrl}
-            </p>
-          ) : null}
+          
         </div>
         <div>
           <label htmlFor="f-desc" className="block text-sm font-medium text-ink-800 dark:text-paper-200">

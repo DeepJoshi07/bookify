@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
 import { BookCard } from "@/components/BookCard.jsx";
 import { EmptyState } from "@/components/EmptyState.jsx";
-import { useAuth } from "@/context/AuthContext.jsx";
 import { useBooks } from "@/context/BooksContext.jsx";
 import { useToast } from "@/context/ToastContext.jsx";
+import { useFirebase } from "../context/Firebase";
 
 export function ListingsPage() {
-  const { user } = useAuth();
+  const { user } = useFirebase();
   const { booksBySeller, deleteBook } = useBooks();
   const { pushToast } = useToast();
 

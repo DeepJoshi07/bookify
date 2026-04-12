@@ -5,7 +5,7 @@ import {
   useMemo,
   useState,
 } from "react";
-import { seedBooks } from "@/data/seedBooks.js";
+import { seededBooks } from "@/data/seedBooks.js";
 
 const BOOKS_KEY = "bookify-books";
 const ORDERS_KEY = "bookify-orders";
@@ -37,12 +37,8 @@ function uid() {
 const BooksContext = createContext(null);
 
 export function BooksProvider({ children }) {
-  const [books, setBooks] = useState(() =>
-    typeof window !== "undefined" ? loadBooks() : seedBooks
-  );
-  const [orders, setOrders] = useState(() =>
-    typeof window !== "undefined" ? loadOrders() : []
-  );
+  const [books, setBooks] = useState(seededBooks);
+  const [orders, setOrders] = useState([]);
 
   const persistBooks = useCallback((next) => {
     setBooks(next);

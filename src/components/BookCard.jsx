@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 
 export function BookCard({ book, showStatus, actions }) {
+
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-card transition hover:-translate-y-0.5 hover:shadow-lg dark:bg-ink-800 dark:shadow-card-dark">
       <Link
@@ -9,7 +10,7 @@ export function BookCard({ book, showStatus, actions }) {
         aria-label={`View ${book.title}`}
       >
         <img
-          src={book.coverUrl}
+          src={book.coverImage}
           alt=""
           className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
         />

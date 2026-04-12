@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 import { EmptyState } from "@/components/EmptyState.jsx";
-import { useAuth } from "@/context/AuthContext.jsx";
 import { useBooks } from "@/context/BooksContext.jsx";
 import { useToast } from "@/context/ToastContext.jsx";
+import { useFirebase } from "../context/Firebase";
 
 export function OrdersPage() {
-  const { user } = useAuth();
+  const { user } = useFirebase();
   const { ordersForUser, getBook, cancelOrder } = useBooks();
   const { pushToast } = useToast();
 

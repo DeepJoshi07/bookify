@@ -1,7 +1,8 @@
-import { Link, NavLink } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext.jsx";
+import { Link, NavLink} from "react-router-dom";
+import userImage from "../assets/user.png"
 import { useTheme } from "@/context/ThemeContext.jsx";
 import { useState } from "react";
+import { useFirebase } from "../context/Firebase";
 
 const navClass = ({ isActive }) =>
   `rounded-lg px-3 py-2 text-sm font-medium transition focus-ring ${
@@ -11,9 +12,12 @@ const navClass = ({ isActive }) =>
   }`;
 
 export function Navbar() {
-  const { user, logout } = useAuth();
+  
+  const {user,logout} = useFirebase();
   const { theme, toggleTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
+
+
 
   return (
     <header className="sticky top-0 z-50 border-b border-paper-200/80 bg-paper-50/90 backdrop-blur-md dark:border-ink-800 dark:bg-ink-900/90">
@@ -91,7 +95,7 @@ export function Navbar() {
           {user ? (
             <div className="flex items-center gap-2 pl-2">
               <img
-                src={user.avatarUrl}
+                src={user.displayImage || userImage}
                 alt=""
                 className="h-9 w-9 rounded-full border border-paper-200 dark:border-ink-600"
                 width={36}
@@ -138,7 +142,7 @@ export function Navbar() {
         {user ? (
           <div className="flex flex-1 items-center justify-end gap-2">
             <img
-              src={user.avatarUrl}
+              src={user.displayImage || userImage}
               alt=""
               className="h-8 w-8 rounded-full"
               width={32}

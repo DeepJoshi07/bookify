@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext.jsx";
+import { useFirebase } from "../context/Firebase";
 
-function validate(name, email, password, confirm) {
+
+function validate(email, password, confirm) {
   const e = {};
-  if (!name.trim()) e.name = "Name is required.";
+
   if (!email.trim()) e.email = "Email is required.";
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = "Enter a valid email.";
   if (!password) e.password = "Password is required.";
@@ -14,9 +15,8 @@ function validate(name, email, password, confirm) {
 }
 
 export function SignupPage() {
-  const { signup } = useAuth();
+  const { signup,googleLogin } = useFirebase();
   const navigate = useNavigate();
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -24,10 +24,10 @@ export function SignupPage() {
 
   function handleSubmit(ev) {
     ev.preventDefault();
-    const next = validate(name, email, password, confirm);
+    const next = validate(email, password, confirm);
     setErrors(next);
     if (Object.keys(next).length > 0) return;
-    signup(name.trim(), email.trim(), password);
+    signup(email.trim(), password);
     navigate("/");
   }
 
@@ -41,25 +41,6 @@ export function SignupPage() {
       </p>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-4" noValidate>
-        <div>
-          <label htmlFor="signup-name" className="block text-sm font-medium text-ink-800 dark:text-paper-200">
-            Name
-          </label>
-          <input
-            id="signup-name"
-            autoComplete="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="focus-ring mt-1 w-full rounded-xl border border-paper-200 bg-white px-4 py-3 dark:border-ink-600 dark:bg-ink-800 dark:text-paper-50"
-            aria-invalid={!!errors.name}
-            aria-describedby={errors.name ? "signup-name-err" : undefined}
-          />
-          {errors.name ? (
-            <p id="signup-name-err" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
-              {errors.name}
-            </p>
-          ) : null}
-        </div>
         <div>
           <label htmlFor="signup-email" className="block text-sm font-medium text-ink-800 dark:text-paper-200">
             Email
@@ -140,6 +121,7 @@ export function SignupPage() {
       </div>
 
       <button
+      onClick={googleLogin}
         type="button"
         className="focus-ring flex w-full items-center justify-center gap-2 rounded-xl border border-paper-200 bg-white py-3 text-sm font-medium dark:border-ink-600 dark:bg-ink-800 dark:text-paper-100"
         aria-label="Sign up with Google (demo UI only)"

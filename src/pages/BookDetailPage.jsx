@@ -2,14 +2,14 @@ import { useMemo } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { BookCard } from "@/components/BookCard.jsx";
 import { LoadingSpinner } from "@/components/LoadingSpinner.jsx";
-import { useAuth } from "@/context/AuthContext.jsx";
 import { useBooks } from "@/context/BooksContext.jsx";
 import { useToast } from "@/context/ToastContext.jsx";
+import { useFirebase } from "../context/Firebase";
 
 export function BookDetailPage() {
   const { id } = useParams();
   const { getBook, relatedBooks, purchaseBook } = useBooks();
-  const { user } = useAuth();
+  const {user} = useFirebase();
   const { pushToast } = useToast();
   const navigate = useNavigate();
 
@@ -58,7 +58,7 @@ export function BookDetailPage() {
       <div className="grid gap-10 lg:grid-cols-[minmax(0,280px)_1fr]">
         <div className="overflow-hidden rounded-2xl bg-white shadow-card dark:bg-ink-800 dark:shadow-card-dark">
           <img
-            src={book.coverUrl}
+            src={book.coverImage}
             alt=""
             className="aspect-[2/3] w-full object-cover"
           />

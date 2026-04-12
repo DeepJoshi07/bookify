@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext.jsx";
+import { useFirebase } from "../context/Firebase";
+
 
 function validate(email, password) {
   const e = {};
@@ -12,7 +13,7 @@ function validate(email, password) {
 }
 
 export function LoginPage() {
-  const { login } = useAuth();
+  const { login,googleLogin } = useFirebase();
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state?.from) ?? "/";
@@ -100,6 +101,7 @@ export function LoginPage() {
       </div>
 
       <button
+      onClick={googleLogin}
         type="button"
         className="focus-ring flex w-full items-center justify-center gap-2 rounded-xl border border-paper-200 bg-white py-3 text-sm font-medium text-ink-800 dark:border-ink-600 dark:bg-ink-800 dark:text-paper-100"
         aria-label="Sign in with Google (demo UI only)"
