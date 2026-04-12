@@ -25,14 +25,7 @@ function validate(f, userEmail) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) e.email = "Enter a valid email.";
   const p = parseFloat(f.price);
   if (Number.isNaN(p) || p <= 0) e.price = "Enter a valid price.";
-  if (!f.coverImage.trim()) e.coverImage = "Cover image URL is required.";
-  else {
-    try {
-      new URL(f.coverImage);
-    } catch {
-      e.coverImage = "Enter a valid image URL.";
-    }
-  }
+
   if (!f.description.trim()) e.description = "Description is required.";
   return e;
 }
@@ -40,8 +33,8 @@ function validate(f, userEmail) {
 export function AddEditListingPage() {
   const { id } = useParams();
   const isEdit = Boolean(id);
-  const {user} = useFirebase();
-  const { getBook, addBook, updateBook } = useBooks();
+  const {user, getBook, addBook, updateBook} = useFirebase();
+  // const { getBook, addBook, updateBook } = useBooks();
   const { pushToast } = useToast();
   const navigate = useNavigate();
 
@@ -107,7 +100,7 @@ export function AddEditListingPage() {
         author: form.author.trim(),
         sellerEmail,
         price,
-        coverImage: form.coverImage.trim(),
+        coverImage: form.coverImage,
         description: form.description.trim(),
         sellerId: user.id,
       });

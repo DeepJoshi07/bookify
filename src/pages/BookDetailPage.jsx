@@ -8,8 +8,8 @@ import { useFirebase } from "../context/Firebase";
 
 export function BookDetailPage() {
   const { id } = useParams();
-  const { getBook, relatedBooks, purchaseBook } = useBooks();
-  const {user} = useFirebase();
+  // const { getBook, relatedBooks, purchaseBook } = useBooks();
+  const {user, getBook, relatedBooks, purchaseBook} = useFirebase();
   const { pushToast } = useToast();
   const navigate = useNavigate();
 

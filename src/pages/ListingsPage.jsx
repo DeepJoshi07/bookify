@@ -6,11 +6,11 @@ import { useToast } from "@/context/ToastContext.jsx";
 import { useFirebase } from "../context/Firebase";
 
 export function ListingsPage() {
-  const { user } = useFirebase();
-  const { booksBySeller, deleteBook } = useBooks();
+  const { user, booksBySeller, deleteBook  } = useFirebase();
+  // const { booksBySeller, deleteBook } = useBooks();
   const { pushToast } = useToast();
 
-  const mine = user ? booksBySeller(user.id) : [];
+  const mine = async() => user ? await booksBySeller(user.id) : [];
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">

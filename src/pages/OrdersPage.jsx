@@ -5,11 +5,11 @@ import { useToast } from "@/context/ToastContext.jsx";
 import { useFirebase } from "../context/Firebase";
 
 export function OrdersPage() {
-  const { user } = useFirebase();
-  const { ordersForUser, getBook, cancelOrder } = useBooks();
+  const { user,ordersForUser, getBook, cancelOrder  } = useFirebase();
+  // const { ordersForUser, getBook, cancelOrder } = useBooks();
   const { pushToast } = useToast();
 
-  const list = user ? ordersForUser(user.id) : [];
+  const list = async() => user ? await ordersForUser(user.id) : [];
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
@@ -37,7 +37,7 @@ export function OrdersPage() {
         </div>
       ) : (
         <ul className="mt-10 space-y-4">
-          {list.map((order) => {
+          {list && list.map((order) => {
             const book = getBook(order.bookId);
             if (!book) return null;
             return (

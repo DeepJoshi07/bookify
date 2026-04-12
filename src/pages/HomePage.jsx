@@ -2,9 +2,11 @@ import { Link } from "react-router-dom";
 import { BookCard } from "@/components/BookCard.jsx";
 import { useBooks } from "@/context/BooksContext.jsx";
 import hero from "../assets/hero.png";
+import { useFirebase } from "../context/Firebase";
 
 export function HomePage() {
-  const { books } = useBooks();
+  // const { books } = useBooks();
+  const {books} = useFirebase();
   const featured = books.filter((b) => b.status === "available").slice(0, 4);
 
   return (

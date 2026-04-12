@@ -2,9 +2,11 @@ import { useMemo, useState } from "react";
 import { BookCard } from "@/components/BookCard.jsx";
 import { EmptyState } from "@/components/EmptyState.jsx";
 import { useBooks } from "@/context/BooksContext.jsx";
+import { useFirebase } from "../context/Firebase";
 
 export function BrowsePage() {
-  const { books } = useBooks();
+  const {books} = useFirebase();
+  // const { books } = useBooks();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("available");
 

@@ -5,8 +5,8 @@ import { useFirebase } from "../context/Firebase";
 
 export function OrderDetailPage() {
   const { id } = useParams();
-  const { user } = useFirebase();
-  const { orders, getBook } = useBooks();
+  const { user, orders, getBook  } = useFirebase();
+  // const { orders, getBook } = useBooks();
 
   const order = useMemo(
     () => orders.find((o) => o.id === id),
