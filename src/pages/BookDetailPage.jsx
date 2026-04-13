@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { BookCard } from "@/components/BookCard.jsx";
 import { LoadingSpinner } from "@/components/LoadingSpinner.jsx";
@@ -8,18 +8,30 @@ import { useFirebase } from "../context/Firebase";
 
 export function BookDetailPage() {
   const { id } = useParams();
-  // const { getBook, relatedBooks, purchaseBook } = useBooks();
-  const {user, getBook, relatedBooks, purchaseBook} = useFirebase();
+  const {user,books,getBooks, getBook, relatedBooks, purchaseBook} = useFirebase();
   const { pushToast } = useToast();
   const navigate = useNavigate();
 
-  const book = id ? getBook(id) : undefined;
-  const related = id ? relatedBooks(id, 4) : [];
+  const [book,setBook] = useState(null);
+  useEffect(()=>{
+    const getData = async() =>{
+      const data = await getBook(id);
+      setBook(data);
+    }
+    getData()
+  },[getBook])
+  // console.log(book)
+ 
+  const [related,setRelated] = useState([])
+  useEffect(() => {
+    const getData = async() => {
+      const data = await relatedBooks(id, 4)
+      setRelated(data);
+    }
+    getData()
+  },[relatedBooks])
+  
 
-  const canBuy = useMemo(() => {
-    if (!book || !user) return false;
-    return book.status === "available" && book.sellerId !== user.id;
-  }, [book, user]);
 
   if (!id) {
     return <LoadingSpinner label="Missing book" />;
@@ -69,7 +81,7 @@ export function BookDetailPage() {
           </h1>
           <p className="mt-2 text-lg text-ink-700 dark:text-paper-200">{book.author}</p>
           <p className="mt-4 text-3xl font-semibold text-accent dark:text-orange-300">
-            ${book.price.toFixed(2)}
+            ${book.price}
           </p>
           <dl className="mt-8 space-y-3 text-sm">
             <div>
@@ -105,7 +117,7 @@ export function BookDetailPage() {
               <button
                 type="button"
                 onClick={handleBuy}
-                disabled={!canBuy && !!user && book.sellerId === user.id}
+                disabled={!books && !!user && book.sellerId === user.id}
                 className="focus-ring rounded-xl bg-accent px-8 py-3 text-sm font-semibold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {!user ? "Log in to buy" : book.sellerId === user.id ? "Your listing" : "Buy now"}
@@ -115,7 +127,7 @@ export function BookDetailPage() {
         </div>
       </div>
 
-      {related.length > 0 ? (
+      {related && related.length > 0? (
         <section className="mt-16 border-t border-paper-200 pt-12 dark:border-ink-800">
           <h2 className="font-display text-xl font-bold text-ink-900 dark:text-paper-50">
             Similar books

@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom";
 import { BookCard } from "@/components/BookCard.jsx";
-import { useBooks } from "@/context/BooksContext.jsx";
 import hero from "../assets/hero.png";
 import { useFirebase } from "../context/Firebase";
 
+
 export function HomePage() {
-  // const { books } = useBooks();
-  const {books} = useFirebase();
-  const featured = books.filter((b) => b.status === "available").slice(0, 4);
+  const { books} = useFirebase();
+
+
+  const featured = books;
 
   return (
     <div>
@@ -94,8 +95,12 @@ export function HomePage() {
                 Selling
               </h3>
               <ol className="mt-4 list-decimal space-y-3 pl-5 text-sm text-ink-700 dark:text-paper-200">
-                <li>Create an account and add a listing with cover and price.</li>
-                <li>Manage your books under Listings — edit or remove anytime.</li>
+                <li>
+                  Create an account and add a listing with cover and price.
+                </li>
+                <li>
+                  Manage your books under Listings — edit or remove anytime.
+                </li>
                 <li>When someone buys, the listing shows as sold.</li>
               </ol>
             </div>

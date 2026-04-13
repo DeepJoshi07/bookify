@@ -1,27 +1,14 @@
 import { useMemo, useState } from "react";
 import { BookCard } from "@/components/BookCard.jsx";
 import { EmptyState } from "@/components/EmptyState.jsx";
-import { useBooks } from "@/context/BooksContext.jsx";
+
 import { useFirebase } from "../context/Firebase";
 
 export function BrowsePage() {
   const {books} = useFirebase();
-  // const { books } = useBooks();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("available");
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return books.filter((b) => {
-      if (status !== "all" && b.status !== status) return false;
-      if (!q) return true;
-      return (
-        b.title.toLowerCase().includes(q) ||
-        b.author.toLowerCase().includes(q) ||
-        b.isbn.includes(q)
-      );
-    });
-  }, [books, query, status]);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
@@ -64,7 +51,7 @@ export function BrowsePage() {
         </div>
       </div>
 
-      {filtered.length === 0 ? (
+      {books.length === 0 ? (
         <div className="mt-12">
           <EmptyState
             title="No books match your filters"
@@ -85,7 +72,7 @@ export function BrowsePage() {
         </div>
       ) : (
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {filtered.map((book) => (
+          {books.map((book) => (
             <BookCard key={book.id} book={book} showStatus />
           ))}
         </div>

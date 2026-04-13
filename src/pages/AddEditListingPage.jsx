@@ -33,8 +33,8 @@ function validate(f, userEmail) {
 export function AddEditListingPage() {
   const { id } = useParams();
   const isEdit = Boolean(id);
-  const {user, getBook, addBook, updateBook} = useFirebase();
-  // const { getBook, addBook, updateBook } = useBooks();
+  const {user, getBooks, addBook, updateBook} = useFirebase();
+
   const { pushToast } = useToast();
   const navigate = useNavigate();
 
@@ -44,7 +44,7 @@ export function AddEditListingPage() {
 
   useEffect(() => {
     if (!id || !user) return;
-    const book = getBook(id);
+    const book = getBooks(id);
     if (!book || book.sellerId !== user.id) {
       navigate("/my-listings", { replace: true });
       return;
@@ -58,7 +58,7 @@ export function AddEditListingPage() {
       coverImage: book.coverImage,
       description: book.description,
     });
-  }, [id, user, getBook, navigate]);
+  }, [id, user, getBooks, navigate]);
 
   function handleFile(ev) {
     const file = ev.target.files?.[0];
@@ -102,7 +102,7 @@ export function AddEditListingPage() {
         price,
         coverImage: form.coverImage,
         description: form.description.trim(),
-        sellerId: user.id,
+        sellerId: user.uid,
       });
       pushToast("Listing added.", "success");
     }

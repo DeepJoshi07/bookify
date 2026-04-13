@@ -18,7 +18,8 @@ import {
   deleteDoc,
   collection,
   query,
-  where
+  limit,
+  where,
 } from "firebase/firestore";
 import {
   getStorage,
@@ -56,10 +57,15 @@ const FireContext = createContext();
 
 export const useFirebase = () => useContext(FireContext);
 
+// {
+//   Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugit aspernatur necessitatibus veniam tempore perferendis facere, perspiciatis unde sed earum amet cupiditate, nesciunt distinctio accusamus! At quidem accusantium odio perferendis esse!
+// }
+
 function FireProvider({ children }) {
   const [user, setUser] = useState(null);
   const [books, setBooks] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [loading,setLoading] = useState(true);
 
   const signup = async (email, password) => {
     return await createUserWithEmailAndPassword(fireAuth, email, password);
@@ -82,21 +88,19 @@ function FireProvider({ children }) {
     const sub = onAuthStateChanged(fireAuth, (u) => {
       if (!u) return;
       setUser(u);
-      console.log(u);
+      setLoading(false);
     });
 
     return () => sub();
   }, []);
 
   const addImage = async (image) => {
-    const storageRef = ref(
-      fireStorage,
-      `/upload/images/${Date.now()}-${image.name}`,
-    );
+    const imageRef = `/upload/images/${Date.now()}-${image.name}`;
+    const storageRef = ref(fireStorage, imageRef);
     await uploadBytes(storageRef, image);
     const url = await getDownloadURL(storageRef);
     return {
-      imagePath: storageRef.path,
+      imagePath: imageRef,
       coverUrl: url,
     };
   };
@@ -109,20 +113,21 @@ function FireProvider({ children }) {
   const addBook = useCallback(
     async (bookData) => {
       if (bookData.coverImage) {
-        const imageData = await addImage(bookData.coverImage);
+        const { imagePath, coverUrl } = await addImage(bookData.coverImage);
         bookData = {
           ...bookData,
-          coverImage: imageData.coverUrl,
-          coverPath: imageData.imagePath,
+          coverImage: coverUrl,
+          coverPath: imagePath,
         };
       }
       const collectionRef = collection(fireStore, "books");
       await addDoc(collectionRef, bookData);
+    
     },
-    [books],
+    [fireStore],
   );
 
-  const getBook = useCallback(async () => {
+  const getBooks = useCallback(async () => {
     if (!user) return;
     const collectionRef = collection(fireStore, "books");
     const data = await getDocs(collectionRef);
@@ -131,11 +136,22 @@ function FireProvider({ children }) {
       ...doc.data(),
     }));
     setBooks(dataList);
-  }, [books, addBook, fireStore]);
+  }, [user, fireStore]);
+
+  const getBook = useCallback(async(bookId) => {
+    if(!user)return;
+    const docRef = doc(fireStore,"books",bookId)
+    const bookData = await getDoc(docRef);
+    const data = {...bookData.data(), id:bookData.id}
+    return data;
+  },[fireStore,user])
+
+  useEffect(() => {
+    getBooks();
+  }, [getBooks]);
 
   const updateBook = useCallback(
     async (id, payload) => {
-      
       if (payload.coverImage) {
         const docRef = doc(fireStore, "book", id);
         const oldDoc = await getDoc(docRef);
@@ -154,7 +170,7 @@ function FireProvider({ children }) {
       const docRef = doc(fireStore, "books", id);
       await updateDoc(docRef);
     },
-    [books, fireStore, fireStorage],
+    [fireStore],
   );
 
   const deleteBook = useCallback(
@@ -169,10 +185,12 @@ function FireProvider({ children }) {
   );
 
   const booksBySeller = useCallback(
-    (id) => {
-      () => books.filter((b) => b.sellerId === id);
+    
+    () => {
+      if(!user) return;
+      return books.filter((b) => b.sellerId === user.uid);
     },
-    [books],
+    [user,books],
   );
 
   const purchaseBook = useCallback(
@@ -191,46 +209,54 @@ function FireProvider({ children }) {
   );
 
   const cancelOrder = useCallback(
-    async(orderId) => {
-      const docRef = doc(fireStore,"orders",orderId)
-      await deleteDoc(docRef)
+    async (orderId) => {
+      const docRef = doc(fireStore, "orders", orderId);
+      await deleteDoc(docRef);
     },
     [orders, books],
   );
 
   const ordersForUser = useCallback(
-  async (userId) => {
-    if(!userId)return;
-    const q = query(
-      collection(fireStore, "orders"),
-      where("userId", "==", userId)
-    );
+    async (userId) => {
+      if (!userId) return;
+      const q = query(
+        collection(fireStore, "orders"),
+        where("userId", "==", userId),
+      );
 
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-  },
-  [fireStore]);
+      const snapshot = await getDocs(q);
+      return snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+    },
+    [fireStore],
+  );
 
-  const relatedBooks = useCallback(async(bookId,limit=4) => {
-    const docRef = doc(fireStore,"books");
-    const q = query(docRef,where("id","!=",bookId),limit);
-    const snapshot = await getDocs(q);
-    const data = snapshot.docs.map((doc) => ({id:doc.id,...doc.data()}))
-    return data;
-  },[books]);
+  const relatedBooks = useCallback(
+    async (bookId, limitCount = 4) => {
+      if(!user)return;
+      const collectionRef = collection(fireStore, "books");
+      const q = query(collectionRef, limit(limitCount));
+      const snapshot = await getDocs(q);
+      let data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      data = data.filter((doc) => doc.id !== bookId);
+      return data;
+    },
+    [fireStore,user],
+  );
 
   const value = useMemo(
     () => ({
       user,
       books,
       orders,
+      loading,
       login,
       logout,
       signup,
       googleLogin,
+      getBooks,
       getBook,
       addBook,
       updateBook,
@@ -249,7 +275,7 @@ function FireProvider({ children }) {
       logout,
       signup,
       googleLogin,
-      getBook,
+      getBooks,
       addBook,
       updateBook,
       deleteBook,
