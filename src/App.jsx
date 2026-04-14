@@ -23,7 +23,7 @@ export default function App() {
           <Route path="login" element={<LoginPage />} />
           <Route path="signup" element={<SignupPage />} />
           <Route
-            path="my-listings"
+            path="/my-listings"
             element={
               <ProtectedRoute>
                 <ListingsPage />
@@ -31,7 +31,7 @@ export default function App() {
             }
           />
           <Route
-            path="listings/new"
+            path="/listings/new"
             element={
               <ProtectedRoute>
                 <AddEditListingPage />
@@ -39,7 +39,7 @@ export default function App() {
             }
           />
           <Route
-            path="listings/:id/edit"
+            path="/listings/:id/edit"
             element={
               <ProtectedRoute>
                 <AddEditListingPage />
@@ -47,7 +47,7 @@ export default function App() {
             }
           />
           <Route
-            path="orders"
+            path="/orders"
             element={
               <ProtectedRoute>
                 <OrdersPage />
@@ -55,7 +55,7 @@ export default function App() {
             }
           />
           <Route
-            path="orders/:id"
+            path="/orders/:id"
             element={
               <ProtectedRoute>
                 <OrderDetailPage />

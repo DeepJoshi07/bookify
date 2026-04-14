@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useBooks } from "@/context/BooksContext.jsx";
 import { useToast } from "@/context/ToastContext.jsx";
 import { useFirebase } from "../context/Firebase";
 
@@ -33,7 +32,7 @@ function validate(f, userEmail) {
 export function AddEditListingPage() {
   const { id } = useParams();
   const isEdit = Boolean(id);
-  const {user, getBooks, addBook, updateBook} = useFirebase();
+  const { user, getBooks, getBook, addBook, updateBook } = useFirebase();
 
   const { pushToast } = useToast();
   const navigate = useNavigate();
@@ -44,32 +43,32 @@ export function AddEditListingPage() {
 
   useEffect(() => {
     if (!id || !user) return;
-    const book = getBooks(id);
-    if (!book || book.sellerId !== user.id) {
-      navigate("/my-listings", { replace: true });
-      return;
-    }
-    setForm({
-      title: book.title,
-      isbn: book.isbn,
-      author: book.author,
-      email: book.sellerEmail,
-      price: String(book.price),
-      coverImage: book.coverImage,
-      description: book.description,
-    });
-  }, [id, user, getBooks, navigate]);
+    const getData = async () => {
+      const data = await getBook(id);
+      
+      if (!data || data.sellerId !== user.uid) {
+        navigate("/my-listings", { replace: true });
+        return;
+      }
+      setForm({
+        title: data.title ?? "",
+        isbn: data.isbn ?? "",
+        author: data.author ?? "",
+        email: data.sellerEmail ?? "",
+        price: data.price != null? String(data.price) : "",
+        coverImage: data.coverImage.name ?? "",
+        description: data.description ?? "",
+      });
+      console.log(data.coverImage.name)
+    };
+    getData()
+  }, [id, user, getBook, navigate]);
 
   function handleFile(ev) {
     const file = ev.target.files?.[0];
     if (!file) return;
     setFileName(file.name);
-    setForm(p => ({...p,coverImage:file}))
-    // const reader = new FileReader();
-    // reader.onload = (e) => {
-    //   setForm((f) => ({ ...f, coverImage: e.target.result }));
-    // };
-    // reader.readAsDataURL(file);
+    setForm((p) => ({ ...p, coverImage: file }));
   }
 
   function handleSubmit(ev) {
@@ -89,7 +88,7 @@ export function AddEditListingPage() {
         author: form.author.trim(),
         sellerEmail,
         price,
-        coverImage: form.coverImage.trim(),
+        coverImage: form.coverImage,
         description: form.description.trim(),
       });
       pushToast("Listing updated.", "success");
@@ -148,7 +147,10 @@ export function AddEditListingPage() {
           hint={`Defaults to your account: ${user?.email ?? ""}`}
         />
         <div>
-          <label htmlFor="f-price" className="block text-sm font-medium text-ink-800 dark:text-paper-200">
+          <label
+            htmlFor="f-price"
+            className="block text-sm font-medium text-ink-800 dark:text-paper-200"
+          >
             Price (USD)
           </label>
           <input
@@ -162,7 +164,10 @@ export function AddEditListingPage() {
             aria-invalid={!!errors.price}
           />
           {errors.price ? (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+            <p
+              className="mt-1 text-sm text-red-600 dark:text-red-400"
+              role="alert"
+            >
               {errors.price}
             </p>
           ) : null}
@@ -172,7 +177,7 @@ export function AddEditListingPage() {
             Cover image
           </span>
           <p className="mt-1 text-xs text-ink-600 dark:text-paper-400">
-            Upload a file (stored as data URL) 
+            Upload a file (stored as data URL)
           </p>
           <input
             type="file"
@@ -184,22 +189,29 @@ export function AddEditListingPage() {
           {fileName ? (
             <p className="mt-1 text-xs text-ink-600">Selected: {fileName}</p>
           ) : null}
-          
         </div>
         <div>
-          <label htmlFor="f-desc" className="block text-sm font-medium text-ink-800 dark:text-paper-200">
+          <label
+            htmlFor="f-desc"
+            className="block text-sm font-medium text-ink-800 dark:text-paper-200"
+          >
             About
           </label>
           <textarea
             id="f-desc"
             rows={4}
             value={form.description}
-            onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, description: e.target.value }))
+            }
             className="focus-ring mt-1 w-full rounded-xl border border-paper-200 bg-white px-4 py-3 dark:border-ink-600 dark:bg-ink-800 dark:text-paper-50"
             aria-invalid={!!errors.description}
           />
           {errors.description ? (
-            <p className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+            <p
+              className="mt-1 text-sm text-red-600 dark:text-red-400"
+              role="alert"
+            >
               {errors.description}
             </p>
           ) : null}
@@ -223,21 +235,20 @@ export function AddEditListingPage() {
   );
 }
 
-function Field({
-  label,
-  id,
-  value,
-  onChange,
-  error,
-  hint,
-  type = "text",
-}) {
+function Field({ label, id, value, onChange, error, hint, type = "text" }) {
   return (
     <div>
-      <label htmlFor={id} className="block text-sm font-medium text-ink-800 dark:text-paper-200">
+      <label
+        htmlFor={id}
+        className="block text-sm font-medium text-ink-800 dark:text-paper-200"
+      >
         {label}
       </label>
-      {hint ? <p className="mt-0.5 text-xs text-ink-600 dark:text-paper-400">{hint}</p> : null}
+      {hint ? (
+        <p className="mt-0.5 text-xs text-ink-600 dark:text-paper-400">
+          {hint}
+        </p>
+      ) : null}
       <input
         id={id}
         type={type}

@@ -2,6 +2,7 @@ const demoSellerId = "user-demo-1";
 
 export const seededBooks = [
   {
+    // milk honey
     id: "b1",
     title: "The Design of Everyday Things",
     isbn: "9780465050659",
@@ -16,6 +17,7 @@ export const seededBooks = [
     status: "available",
   },
   {
+    // corporate
     id: "b2",
     title: "Project Hail Mary",
     isbn: "9780593135204",
@@ -30,6 +32,7 @@ export const seededBooks = [
     status: "available",
   },
   {
+    // horror
     id: "b3",
     title: "Atomic Habits",
     isbn: "9780735211292",
@@ -44,6 +47,7 @@ export const seededBooks = [
     status: "available",
   },
   {
+    
     id: "b4",
     title: "Dune",
     isbn: "9780441172719",

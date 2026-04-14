@@ -2,36 +2,31 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { BookCard } from "@/components/BookCard.jsx";
 import { LoadingSpinner } from "@/components/LoadingSpinner.jsx";
-import { useBooks } from "@/context/BooksContext.jsx";
 import { useToast } from "@/context/ToastContext.jsx";
 import { useFirebase } from "../context/Firebase";
 
 export function BookDetailPage() {
   const { id } = useParams();
-  const {user,books,getBooks, getBook, relatedBooks, purchaseBook} = useFirebase();
+  const { user, books, getBook, relatedBooks, purchaseBook } = useFirebase();
   const { pushToast } = useToast();
   const navigate = useNavigate();
-
-  const [book,setBook] = useState(null);
-  useEffect(()=>{
-    const getData = async() =>{
+  const [book, setBook] = useState(null);
+  useEffect(() => {
+    const getData = async () => {
       const data = await getBook(id);
       setBook(data);
-    }
-    getData()
-  },[getBook])
-  // console.log(book)
- 
-  const [related,setRelated] = useState([])
-  useEffect(() => {
-    const getData = async() => {
-      const data = await relatedBooks(id, 4)
-      setRelated(data);
-    }
-    getData()
-  },[relatedBooks])
-  
+    };
+    getData();
+  }, [getBook]);
 
+  const [related, setRelated] = useState([]);
+  useEffect(() => {
+    const getData = async () => {
+      const data = await relatedBooks(id, 4);
+      setRelated(data);
+    };
+    getData();
+  }, [relatedBooks]);
 
   if (!id) {
     return <LoadingSpinner label="Missing book" />;
@@ -43,7 +38,10 @@ export function BookDetailPage() {
         <h1 className="font-display text-2xl font-bold text-ink-900 dark:text-paper-50">
           Book not found
         </h1>
-        <Link to="/books" className="mt-4 inline-block text-accent hover:underline">
+        <Link
+          to="/books"
+          className="mt-4 inline-block text-accent hover:underline"
+        >
           Back to browse
         </Link>
       </div>
@@ -56,13 +54,16 @@ export function BookDetailPage() {
       return;
     }
     if (!book) return;
-    const order = purchaseBook(book.id, user.id);
-    if (order) {
-      pushToast("Order placed successfully.", "success");
-      navigate(`/orders/${order.id}`);
-    } else {
-      pushToast("Could not complete purchase.", "error");
-    }
+    const getData = async () => {
+      const data = await purchaseBook(book.id, user.uid);
+      if (data) {
+        pushToast("Order placed successfully.", "success");
+        navigate(`/orders/${data.id}`);
+      } else {
+        pushToast("Could not complete purchase.", "error");
+      }
+    };
+    getData();
   }
 
   return (
@@ -79,17 +80,23 @@ export function BookDetailPage() {
           <h1 className="font-display text-3xl font-bold text-ink-900 dark:text-paper-50">
             {book.title}
           </h1>
-          <p className="mt-2 text-lg text-ink-700 dark:text-paper-200">{book.author}</p>
+          <p className="mt-2 text-lg text-ink-700 dark:text-paper-200">
+            {book.author}
+          </p>
           <p className="mt-4 text-3xl font-semibold text-accent dark:text-orange-300">
             ${book.price}
           </p>
           <dl className="mt-8 space-y-3 text-sm">
             <div>
-              <dt className="font-medium text-ink-600 dark:text-paper-400">ISBN</dt>
+              <dt className="font-medium text-ink-600 dark:text-paper-400">
+                ISBN
+              </dt>
               <dd className="text-ink-900 dark:text-paper-100">{book.isbn}</dd>
             </div>
             <div>
-              <dt className="font-medium text-ink-600 dark:text-paper-400">Seller email</dt>
+              <dt className="font-medium text-ink-600 dark:text-paper-400">
+                Seller email
+              </dt>
               <dd>
                 <a
                   href={`mailto:${book.sellerEmail}`}
@@ -100,19 +107,25 @@ export function BookDetailPage() {
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-ink-600 dark:text-paper-400">Status</dt>
+              <dt className="font-medium text-ink-600 dark:text-paper-400">
+                Status
+              </dt>
               <dd className="capitalize">{book.status}</dd>
             </div>
           </dl>
           <div className="mt-8">
-            <h2 className="text-sm font-semibold text-ink-900 dark:text-paper-50">About</h2>
+            <h2 className="text-sm font-semibold text-ink-900 dark:text-paper-50">
+              About
+            </h2>
             <p className="mt-2 max-w-prose text-ink-700 dark:text-paper-200">
               {book.description}
             </p>
           </div>
           <div className="mt-10">
             {book.status === "sold" ? (
-              <p className="text-sm text-ink-600 dark:text-paper-400">This listing is sold.</p>
+              <p className="text-sm text-ink-600 dark:text-paper-400">
+                This listing is sold.
+              </p>
             ) : (
               <button
                 type="button"
@@ -120,14 +133,18 @@ export function BookDetailPage() {
                 disabled={!books && !!user && book.sellerId === user.id}
                 className="focus-ring rounded-xl bg-accent px-8 py-3 text-sm font-semibold text-white hover:bg-accent-dark disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {!user ? "Log in to buy" : book.sellerId === user.id ? "Your listing" : "Buy now"}
+                {!user
+                  ? "Log in to buy"
+                  : book.sellerId === user.id
+                    ? "Your listing"
+                    : "Buy now"}
               </button>
             )}
           </div>
         </div>
       </div>
 
-      {related && related.length > 0? (
+      {related && related.length > 0 ? (
         <section className="mt-16 border-t border-paper-200 pt-12 dark:border-ink-800">
           <h2 className="font-display text-xl font-bold text-ink-900 dark:text-paper-50">
             Similar books

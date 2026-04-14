@@ -1,24 +1,12 @@
 import { Link } from "react-router-dom";
 import { BookCard } from "@/components/BookCard.jsx";
 import { EmptyState } from "@/components/EmptyState.jsx";
-import { useBooks } from "@/context/BooksContext.jsx";
 import { useToast } from "@/context/ToastContext.jsx";
 import { useFirebase } from "../context/Firebase";
-import { useEffect, useState } from "react";
 
 export function ListingsPage() {
-  const {user,books, booksBySeller, deleteBook  } = useFirebase();
+  const {mine, deleteBook  } = useFirebase();
   const { pushToast } = useToast();
-
- 
-  const [mine,setMine] = useState([]);
-  useEffect(() => {
-      const getData = async() => {
-        const data = await booksBySeller();
-        setMine(data);
-      }
-      getData()
-  },[user,books])
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">

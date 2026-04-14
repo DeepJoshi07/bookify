@@ -1,15 +1,46 @@
 import { Link } from "react-router-dom";
 import { EmptyState } from "@/components/EmptyState.jsx";
-import { useBooks } from "@/context/BooksContext.jsx";
 import { useToast } from "@/context/ToastContext.jsx";
 import { useFirebase } from "../context/Firebase";
+import { useEffect, useState } from "react";
 
 export function OrdersPage() {
-  const { user,ordersForUser, getBook, cancelOrder  } = useFirebase();
-  // const { ordersForUser, getBook, cancelOrder } = useBooks();
+  const { user, ordersForUser, getBook, cancelOrder } = useFirebase();
   const { pushToast } = useToast();
+  const [list, setList] = useState([]);
+  const [book, setBook] = useState([]);
 
-  const list = async() => user ? await ordersForUser(user.id) : [];
+  useEffect(() => {
+    const getData = async () => {
+      if (!user) return;
+      const data = await ordersForUser(user.uid);
+      setList(data);
+    };
+    getData();
+  }, [ordersForUser, user]);
+
+  useEffect(() => {
+    const getData = async () => {
+      const data = await Promise.all(
+        list.map(async (order) => {
+          const orderData = await getBook(order.bookId);
+          return { ...orderData, orderId: order.id, orderAt: order.orderAt };
+        }),
+      );
+
+      setBook(data);
+    };
+    getData();
+  }, [list, getBook]);
+
+  const handleCancelOrder = async (orderId) => {
+    if (!user) return;
+    await cancelOrder(orderId);
+    pushToast("Order cancelled.", "success");
+    window.location.reload();
+  };
+
+
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
@@ -37,67 +68,65 @@ export function OrdersPage() {
         </div>
       ) : (
         <ul className="mt-10 space-y-4">
-          {list && list.map((order) => {
-            const book = getBook(order.bookId);
-            if (!book) return null;
-            return (
-              <li
-                key={order.id}
-                className="flex flex-col gap-4 rounded-2xl border border-paper-200 bg-white p-4 shadow-card sm:flex-row sm:items-center dark:border-ink-700 dark:bg-ink-800 dark:shadow-card-dark"
-              >
-                <img
-                  src={book.coverUrl}
-                  alt=""
-                  className="h-28 w-20 shrink-0 rounded-lg object-cover sm:h-24 sm:w-[4.5rem]"
-                />
-                <div className="min-w-0 flex-1">
-                  <Link
-                    to={`/orders/${order.id}`}
-                    className="font-display font-semibold text-ink-900 hover:text-accent dark:text-paper-50 dark:hover:text-orange-300"
-                  >
-                    {book.title}
-                  </Link>
-                  <p className="text-sm text-ink-700 dark:text-paper-300">{book.author}</p>
-                  <p className="mt-1 text-sm font-medium text-accent dark:text-orange-300">
-                    ${book.price.toFixed(2)}
-                  </p>
-                  <p className="mt-2 text-xs text-ink-600 dark:text-paper-400">
-                    Ordered {new Date(order.orderedAt).toLocaleString()}
-                  </p>
-                  <span
-                    className={`mt-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-                      order.status === "active"
-                        ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200"
-                        : "bg-paper-200 text-ink-700 dark:bg-ink-700 dark:text-paper-300"
-                    }`}
-                  >
-                    {order.status === "active" ? "Active" : "Cancelled"}
-                  </span>
-                </div>
-                <div className="flex shrink-0 flex-col gap-2 sm:items-end">
-                  <Link
-                    to={`/orders/${order.id}`}
-                    className="focus-ring text-sm font-medium text-accent hover:underline dark:text-orange-300"
-                  >
-                    View details
-                  </Link>
-                  {order.status === "active" ? (
+          {book &&
+            book.map((order) => {
+              if (!book) return null;
+              return (
+                <li
+                  key={order.orderId}
+                  className="flex flex-col gap-4 rounded-2xl border border-paper-200 bg-white p-4 shadow-card sm:flex-row sm:items-center dark:border-ink-700 dark:bg-ink-800 dark:shadow-card-dark"
+                >
+                  <img
+                    src={order.coverImage}
+                    alt=""
+                    className="h-28 w-20 shrink-0 rounded-lg object-cover sm:h-24 sm:w-[4.5rem]"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <Link
+                      to={`/orders/${order.orderId}`}
+                      className="font-display font-semibold text-ink-900 hover:text-accent dark:text-paper-50 dark:hover:text-orange-300"
+                    >
+                      {order.title}
+                    </Link>
+                    <p className="text-sm text-ink-700 dark:text-paper-300">
+                      {order.author}
+                    </p>
+                    <p className="mt-1 text-sm font-medium text-accent dark:text-orange-300">
+                      ${order.price}
+                    </p>
+                    <p className="mt-2 text-xs text-ink-600 dark:text-paper-400">
+                      Ordered on {new Date(order.orderAt).toLocaleString()}
+                    </p>
+                    <span
+                      className={`mt-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium 
+                          "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200"
+                        
+                      }`}
+                    >
+                      Active
+                    </span>
+                  </div>
+                  <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+                    <Link
+                      to={`/orders/${order.orderId}`}
+                      className="focus-ring text-sm font-medium text-accent hover:underline dark:text-orange-300"
+                    >
+                      View details
+                    </Link>
+
                     <button
                       type="button"
                       className="focus-ring rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700 dark:border-red-900 dark:text-red-300"
                       onClick={() => {
-                        if (!user) return;
-                        cancelOrder(order.id, user.id);
-                        pushToast("Order cancelled.", "success");
+                        handleCancelOrder(order.orderId);
                       }}
                     >
                       Cancel order
                     </button>
-                  ) : null}
-                </div>
-              </li>
-            );
-          })}
+                  </div>
+                </li>
+              );
+            })}
         </ul>
       )}
     </div>

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { BookCard } from "@/components/BookCard.jsx";
 import { EmptyState } from "@/components/EmptyState.jsx";
 

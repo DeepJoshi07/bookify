@@ -1,4 +1,3 @@
-import { BooksProvider } from "@/context/BooksContext.jsx";
 import { ThemeProvider } from "@/context/ThemeContext.jsx";
 import { ToastProvider } from "@/context/ToastContext.jsx";
 import { createRoot } from "react-dom/client";
@@ -7,13 +6,11 @@ import FireProvider from "./context/Firebase.jsx";
 import "./index.css";
 
 createRoot(document.getElementById("root")).render(
-  <FireProvider>
-    <ThemeProvider>
-      <ToastProvider>
-        <BooksProvider>
-          <App />
-        </BooksProvider>
-      </ToastProvider>
-    </ThemeProvider>
-  </FireProvider>,
+  <ThemeProvider>
+    <ToastProvider>
+      <FireProvider>
+        <App />
+      </FireProvider>
+    </ToastProvider>
+  </ThemeProvider>,
 );
