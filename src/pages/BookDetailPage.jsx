@@ -5,7 +5,7 @@ import { LoadingSpinner } from "@/components/LoadingSpinner.jsx";
 import { useToast } from "@/context/ToastContext.jsx";
 import { useFirebase } from "../context/Firebase";
 
-export function BookDetailPage() {
+export default function BookDetailPage() {
   const { id } = useParams();
   const { user, books, getBook, relatedBooks, purchaseBook } = useFirebase();
   const { pushToast } = useToast();

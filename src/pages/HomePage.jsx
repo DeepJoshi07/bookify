@@ -2,11 +2,16 @@ import { Link } from "react-router-dom";
 import { BookCard } from "@/components/BookCard.jsx";
 import hero from "../assets/hero.png";
 import { useFirebase } from "../context/Firebase";
+import { useEffect } from "react";
 
-
-export function HomePage() {
-  const { books} = useFirebase();
-
+export default function HomePage() {
+  const { books, getBooks } = useFirebase();
+  useEffect(() => {
+    const getData = async () => {
+      await getBooks();
+    };
+    getData();
+  }, [getBooks]);
 
   const featured = books;
 

@@ -2,33 +2,37 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useFirebase } from "../context/Firebase";
 
-
 function validate(email, password, confirm) {
   const e = {};
 
   if (!email.trim()) e.email = "Email is required.";
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = "Enter a valid email.";
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    e.email = "Enter a valid email.";
   if (!password) e.password = "Password is required.";
   else if (password.length < 6) e.password = "At least 6 characters.";
   if (password !== confirm) e.confirm = "Passwords do not match.";
   return e;
 }
 
-export function SignupPage() {
-  const { signup,googleLogin } = useFirebase();
+export default function SignupPage() {
+  const { signup, googleLogin, user } = useFirebase();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [errors, setErrors] = useState({});
 
-  function handleSubmit(ev) {
+  async function handleSubmit(ev) {
     ev.preventDefault();
     const next = validate(email, password, confirm);
     setErrors(next);
     if (Object.keys(next).length > 0) return;
-    signup(email.trim(), password);
-    navigate("/");
+    const result = await signup(email.trim(), password);
+    if (result.success) {
+      navigate("/");
+    } else {
+      setErrors({ message: "Wrong email or password" });
+    }
   }
 
   return (
@@ -36,13 +40,13 @@ export function SignupPage() {
       <h1 className="font-display text-3xl font-bold text-ink-900 dark:text-paper-50">
         Sign up
       </h1>
-      <p className="mt-2 text-sm text-ink-700 dark:text-paper-300">
-        Create a demo profile to manage listings and orders.
-      </p>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-4" noValidate>
         <div>
-          <label htmlFor="signup-email" className="block text-sm font-medium text-ink-800 dark:text-paper-200">
+          <label
+            htmlFor="signup-email"
+            className="block text-sm font-medium text-ink-800 dark:text-paper-200"
+          >
             Email
           </label>
           <input
@@ -56,13 +60,20 @@ export function SignupPage() {
             aria-describedby={errors.email ? "signup-email-err" : undefined}
           />
           {errors.email ? (
-            <p id="signup-email-err" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+            <p
+              id="signup-email-err"
+              className="mt-1 text-sm text-red-600 dark:text-red-400"
+              role="alert"
+            >
               {errors.email}
             </p>
           ) : null}
         </div>
         <div>
-          <label htmlFor="signup-password" className="block text-sm font-medium text-ink-800 dark:text-paper-200">
+          <label
+            htmlFor="signup-password"
+            className="block text-sm font-medium text-ink-800 dark:text-paper-200"
+          >
             Password
           </label>
           <input
@@ -73,16 +84,34 @@ export function SignupPage() {
             onChange={(e) => setPassword(e.target.value)}
             className="focus-ring mt-1 w-full rounded-xl border border-paper-200 bg-white px-4 py-3 dark:border-ink-600 dark:bg-ink-800 dark:text-paper-50"
             aria-invalid={!!errors.password}
-            aria-describedby={errors.password ? "signup-password-err" : undefined}
+            aria-describedby={
+              errors.password ? "signup-password-err" : undefined
+            }
           />
           {errors.password ? (
-            <p id="signup-password-err" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
-              {errors.password}
+            <p
+              id="signup-password-err"
+              className="mt-1 text-sm text-red-600 dark:text-red-400"
+              role="alert"
+            >
+              {errors.password || errors.message}
+            </p>
+          ) : null}
+          {errors.message ? (
+            <p
+              id="login-password-err"
+              className="mt-1 text-sm text-red-600 dark:text-red-400"
+              role="alert"
+            >
+              {errors.message}
             </p>
           ) : null}
         </div>
         <div>
-          <label htmlFor="signup-confirm" className="block text-sm font-medium text-ink-800 dark:text-paper-200">
+          <label
+            htmlFor="signup-confirm"
+            className="block text-sm font-medium text-ink-800 dark:text-paper-200"
+          >
             Confirm password
           </label>
           <input
@@ -96,7 +125,11 @@ export function SignupPage() {
             aria-describedby={errors.confirm ? "signup-confirm-err" : undefined}
           />
           {errors.confirm ? (
-            <p id="signup-confirm-err" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+            <p
+              id="signup-confirm-err"
+              className="mt-1 text-sm text-red-600 dark:text-red-400"
+              role="alert"
+            >
               {errors.confirm}
             </p>
           ) : null}
@@ -121,7 +154,7 @@ export function SignupPage() {
       </div>
 
       <button
-      onClick={googleLogin}
+        onClick={googleLogin}
         type="button"
         className="focus-ring flex w-full items-center justify-center gap-2 rounded-xl border border-paper-200 bg-white py-3 text-sm font-medium dark:border-ink-600 dark:bg-ink-800 dark:text-paper-100"
         aria-label="Sign up with Google (demo UI only)"
@@ -131,7 +164,10 @@ export function SignupPage() {
 
       <p className="mt-8 text-center text-sm text-ink-700 dark:text-paper-300">
         Already have an account?{" "}
-        <Link to="/login" className="font-medium text-accent hover:underline dark:text-orange-300">
+        <Link
+          to="/login"
+          className="font-medium text-accent hover:underline dark:text-orange-300"
+        >
           Log in
         </Link>
       </p>

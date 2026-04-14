@@ -2,33 +2,35 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useFirebase } from "../context/Firebase";
 
-
 function validate(email, password) {
   const e = {};
   if (!email.trim()) e.email = "Email is required.";
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = "Enter a valid email.";
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    e.email = "Enter a valid email.";
   if (!password) e.password = "Password is required.";
   else if (password.length < 6) e.password = "At least 6 characters.";
   return e;
 }
 
-export function LoginPage() {
-  const { login,googleLogin } = useFirebase();
+export default function LoginPage() {
+  const { login, googleLogin, user } = useFirebase();
   const navigate = useNavigate();
-  const location = useLocation();
-  const from = (location.state?.from) ?? "/";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
 
-  function handleSubmit(ev) {
+  async function handleSubmit(ev) {
     ev.preventDefault();
     const next = validate(email, password);
     setErrors(next);
     if (Object.keys(next).length > 0) return;
-    login(email.trim(), password);
-    navigate(from, { replace: true });
+    const result = await login(email.trim(), password);
+   if (result.success) {
+      navigate("/");
+    } else {
+      setErrors({message:"Wrong email or password"});
+    }
   }
 
   return (
@@ -36,13 +38,13 @@ export function LoginPage() {
       <h1 className="font-display text-3xl font-bold text-ink-900 dark:text-paper-50">
         Log in
       </h1>
-      <p className="mt-2 text-sm text-ink-700 dark:text-paper-300">
-        No backend — any valid-looking credentials create a session.
-      </p>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-4" noValidate>
         <div>
-          <label htmlFor="login-email" className="block text-sm font-medium text-ink-800 dark:text-paper-200">
+          <label
+            htmlFor="login-email"
+            className="block text-sm font-medium text-ink-800 dark:text-paper-200"
+          >
             Email
           </label>
           <input
@@ -56,13 +58,20 @@ export function LoginPage() {
             aria-describedby={errors.email ? "login-email-err" : undefined}
           />
           {errors.email ? (
-            <p id="login-email-err" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
+            <p
+              id="login-email-err"
+              className="mt-1 text-sm text-red-600 dark:text-red-400"
+              role="alert"
+            >
               {errors.email}
             </p>
           ) : null}
         </div>
         <div>
-          <label htmlFor="login-password" className="block text-sm font-medium text-ink-800 dark:text-paper-200">
+          <label
+            htmlFor="login-password"
+            className="block text-sm font-medium text-ink-800 dark:text-paper-200"
+          >
             Password
           </label>
           <input
@@ -73,11 +82,26 @@ export function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             className="focus-ring mt-1 w-full rounded-xl border border-paper-200 bg-white px-4 py-3 text-ink-900 dark:border-ink-600 dark:bg-ink-800 dark:text-paper-50"
             aria-invalid={!!errors.password}
-            aria-describedby={errors.password ? "login-password-err" : undefined}
+            aria-describedby={
+              errors.password ? "login-password-err" : undefined
+            }
           />
           {errors.password ? (
-            <p id="login-password-err" className="mt-1 text-sm text-red-600 dark:text-red-400" role="alert">
-              {errors.password}
+            <p
+              id="login-password-err"
+              className="mt-1 text-sm text-red-600 dark:text-red-400"
+              role="alert"
+            >
+              {errors.password || errors.message}
+            </p>
+          ) : null}
+          {errors.message ? (
+            <p
+              id="login-password-err"
+              className="mt-1 text-sm text-red-600 dark:text-red-400"
+              role="alert"
+            >
+              {errors.message}
             </p>
           ) : null}
         </div>
@@ -101,7 +125,7 @@ export function LoginPage() {
       </div>
 
       <button
-      onClick={googleLogin}
+        onClick={googleLogin}
         type="button"
         className="focus-ring flex w-full items-center justify-center gap-2 rounded-xl border border-paper-200 bg-white py-3 text-sm font-medium text-ink-800 dark:border-ink-600 dark:bg-ink-800 dark:text-paper-100"
         aria-label="Sign in with Google (demo UI only)"
@@ -129,7 +153,10 @@ export function LoginPage() {
 
       <p className="mt-8 text-center text-sm text-ink-700 dark:text-paper-300">
         New here?{" "}
-        <Link to="/signup" className="font-medium text-accent hover:underline dark:text-orange-300">
+        <Link
+          to="/signup"
+          className="font-medium text-accent hover:underline dark:text-orange-300"
+        >
           Create an account
         </Link>
       </p>

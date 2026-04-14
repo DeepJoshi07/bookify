@@ -4,7 +4,7 @@ import { useToast } from "@/context/ToastContext.jsx";
 import { useFirebase } from "../context/Firebase";
 import { useEffect, useState } from "react";
 
-export function OrdersPage() {
+export default function OrdersPage() {
   const { user, ordersForUser, getBook, cancelOrder } = useFirebase();
   const { pushToast } = useToast();
   const [list, setList] = useState([]);

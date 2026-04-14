@@ -4,7 +4,7 @@ import { EmptyState } from "@/components/EmptyState.jsx";
 import { useToast } from "@/context/ToastContext.jsx";
 import { useFirebase } from "../context/Firebase";
 
-export function ListingsPage() {
+export default function ListingsPage() {
   const {mine, deleteBook  } = useFirebase();
   const { pushToast } = useToast();
 

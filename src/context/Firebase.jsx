@@ -20,7 +20,7 @@ import {
   query,
   limit,
   where,
-  onSnapshot
+  onSnapshot,
 } from "firebase/firestore";
 import {
   getStorage,
@@ -67,14 +67,30 @@ function FireProvider({ children }) {
   const [books, setBooks] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [mine,setMine] = useState([]);
+  const [mine, setMine] = useState([]);
 
   const signup = async (email, password) => {
-    return await createUserWithEmailAndPassword(fireAuth, email, password);
+    try {
+      const result = await createUserWithEmailAndPassword(
+        fireAuth,
+        email,
+        password,
+      );
+      return { success: true, user: result.user };
+    } catch (error) {
+      console.log(error.code,error.message)
+      return { success: false, error };
+    }
   };
 
   const login = async (email, password) => {
-    return await signInWithEmailAndPassword(fireAuth, email, password);
+    try {
+    const result = await signInWithEmailAndPassword(fireAuth, email, password);
+    return { success: true, user: result.user };
+  } catch (error) {
+    console.log(error.code,error.message)
+    return { success: false, error };
+  }
   };
 
   const logout = async () => {
@@ -97,16 +113,15 @@ function FireProvider({ children }) {
   }, []);
 
   useEffect(() => {
-  if (!user) return;
-  const unsubscribe = onSnapshot(
-    query(collection(fireStore, "books"), where("sellerId", "==", user.uid)),
-    (snapshot) => {
-      setMine(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-    }
-  );
-  return () => unsubscribe();
-}, [user]);
-
+    if (!user) return;
+    const unsubscribe = onSnapshot(
+      query(collection(fireStore, "books"), where("sellerId", "==", user.uid)),
+      (snapshot) => {
+        setMine(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+      },
+    );
+    return () => unsubscribe();
+  }, [user]);
 
   const addImage = async (image) => {
     const imageRef = `/upload/images/${Date.now()}-${image.name}`;
@@ -141,7 +156,6 @@ function FireProvider({ children }) {
   );
 
   const getBooks = useCallback(async () => {
-    if (!user) return;
     const collectionRef = collection(fireStore, "books");
     const data = await getDocs(collectionRef);
     const dataList = data.docs.map((doc) => ({
@@ -153,7 +167,6 @@ function FireProvider({ children }) {
 
   const getBook = useCallback(
     async (bookId) => {
-      if (!user) return;
       const docRef = doc(fireStore, "books", bookId);
       const bookData = await getDoc(docRef);
       const data = { ...bookData.data(), id: bookData.id };
@@ -163,13 +176,16 @@ function FireProvider({ children }) {
   );
 
   useEffect(() => {
-    getBooks();
+    const getData = async () => {
+      await getBooks();
+    };
+    getData();
   }, [getBooks]);
 
   const updateBook = useCallback(
     async (id, payload) => {
       if (payload.coverImage !== "") {
-        console.log(payload.coverImage)
+        console.log(payload.coverImage);
         const docRef = doc(fireStore, "books", id);
         const oldDoc = await getDoc(docRef);
 
@@ -177,14 +193,14 @@ function FireProvider({ children }) {
           const imageTodelete = await oldDoc.data().coverPath;
           await deleteImage(imageTodelete);
         }
-        
+
         const imageData = await addImage(payload.coverImage);
         payload = {
           ...payload,
           coverImage: imageData.coverUrl,
           coverPath: imageData.imagePath,
         };
-      }else{
+      } else {
         delete payload.coverImage;
       }
 
@@ -214,7 +230,7 @@ function FireProvider({ children }) {
   }, [user, books]);
 
   const purchaseBook = useCallback(
-    async(bookId, userId) => {
+    async (bookId, userId) => {
       const book = books.filter((b) => b.id === bookId);
       if (!book) return;
       const collectionRef = collection(fireStore, "orders");
@@ -226,23 +242,23 @@ function FireProvider({ children }) {
       });
       const data = await getDoc(docRef);
       // console.log(data)
-      return await {...data.data(),id:data.id}
+      return await { ...data.data(), id: data.id };
     },
     [books, orders],
   );
 
   const cancelOrder = useCallback(
     async (orderId) => {
-      if(!user)return;
+      if (!user) return;
       const docRef = doc(fireStore, "orders", orderId);
       await deleteDoc(docRef);
     },
-    [fireStore,user],
+    [fireStore, user],
   );
 
   const ordersForUser = useCallback(
     async (userId) => {
-      if(!user)return;
+      if (!user) return;
       if (!userId) return;
       const q = query(
         collection(fireStore, "orders"),
@@ -254,15 +270,14 @@ function FireProvider({ children }) {
         id: doc.id,
         ...doc.data(),
       }));
-      setOrders(data)
-      return data
+      setOrders(data);
+      return data;
     },
-    [fireStore,user]
+    [fireStore, user],
   );
 
   const relatedBooks = useCallback(
     async (bookId, limitCount = 4) => {
-      if (!user) return;
       const collectionRef = collection(fireStore, "books");
       const q = query(collectionRef, limit(limitCount));
       const snapshot = await getDocs(q);
@@ -300,7 +315,8 @@ function FireProvider({ children }) {
       user,
       books,
       orders,
-      mine,setMine,
+      mine,
+      setMine,
       login,
       logout,
       signup,

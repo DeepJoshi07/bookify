@@ -4,7 +4,7 @@ import { EmptyState } from "@/components/EmptyState.jsx";
 
 import { useFirebase } from "../context/Firebase";
 
-export function BrowsePage() {
+export default function BrowsePage() {
   const {books} = useFirebase();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("available");

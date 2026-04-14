@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useFirebase } from "../context/Firebase";
 
-export function OrderDetailPage() {
+export default function OrderDetailPage() {
   const { id } = useParams();
   const { user, orders, ordersForUser, getBook } = useFirebase();
   const [order, setOrder] = useState(null);

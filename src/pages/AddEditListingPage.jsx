@@ -29,7 +29,7 @@ function validate(f, userEmail) {
   return e;
 }
 
-export function AddEditListingPage() {
+export default function AddEditListingPage() {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const { user, getBooks, getBook, addBook, updateBook } = useFirebase();
