@@ -58,16 +58,14 @@ const FireContext = createContext();
 
 export const useFirebase = () => useContext(FireContext);
 
-// {
-//   Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugit aspernatur necessitatibus veniam tempore perferendis facere, perspiciatis unde sed earum amet cupiditate, nesciunt distinctio accusamus! At quidem accusantium odio perferendis esse!
-// }
 
 function FireProvider({ children }) {
   const [user, setUser] = useState(null);
   const [books, setBooks] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [mine, setMine] = useState([]);
+
+
 
   const signup = async (email, password) => {
     try {
@@ -112,17 +110,6 @@ function FireProvider({ children }) {
     return () => sub();
   }, []);
 
-  useEffect(() => {
-    if (!user) return;
-    const unsubscribe = onSnapshot(
-      query(collection(fireStore, "books"), where("sellerId", "==", user.uid)),
-      (snapshot) => {
-        setMine(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-      },
-    );
-    return () => unsubscribe();
-  }, [user]);
-
   const addImage = async (image) => {
     const imageRef = `/upload/images/${Date.now()}-${image.name}`;
     const storageRef = ref(fireStorage, imageRef);
@@ -151,6 +138,7 @@ function FireProvider({ children }) {
       }
       const collectionRef = collection(fireStore, "books");
       await addDoc(collectionRef, bookData);
+      await getBooks();
     },
     [fireStore],
   );
@@ -163,16 +151,15 @@ function FireProvider({ children }) {
       ...doc.data(),
     }));
     setBooks(dataList);
-  }, [user, fireStore]);
+  }, [fireStore]);
+
 
   const getBook = useCallback(
-    async (bookId) => {
-      const docRef = doc(fireStore, "books", bookId);
-      const bookData = await getDoc(docRef);
-      const data = { ...bookData.data(), id: bookData.id };
-      return data;
+    (bookId) => {
+      const data = books.filter((b) => (b.id === bookId));
+      return data[0];
     },
-    [fireStore, user],
+    [fireStore,books],
   );
 
   useEffect(() => {
@@ -241,7 +228,6 @@ function FireProvider({ children }) {
         status: "active",
       });
       const data = await getDoc(docRef);
-      // console.log(data)
       return await { ...data.data(), id: data.id };
     },
     [books, orders],
@@ -256,36 +242,24 @@ function FireProvider({ children }) {
     [fireStore, user],
   );
 
-  const ordersForUser = useCallback(
-    async (userId) => {
-      if (!user) return;
-      if (!userId) return;
-      const q = query(
+  const getOrders = useCallback(async() =>{
+    if(!user)return;
+    const q = query(
         collection(fireStore, "orders"),
-        where("userId", "==", userId),
+        where("userId", "==", user.uid),
       );
-
-      const snapshot = await getDocs(q);
-      const data = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setOrders(data);
-      return data;
-    },
-    [fireStore, user],
-  );
+    const data = await getDocs(q)
+    const dataList = data.docs.map((o)=>({...o.data(),id:o.id}))
+    setOrders(dataList);
+    return dataList
+  },[fireStore,user])
 
   const relatedBooks = useCallback(
-    async (bookId, limitCount = 4) => {
-      const collectionRef = collection(fireStore, "books");
-      const q = query(collectionRef, limit(limitCount));
-      const snapshot = await getDocs(q);
-      let data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      data = data.filter((doc) => doc.id !== bookId);
+    (bookId, limitCount = 4) => {
+      const data = books.filter((b) => (b.id !== bookId));
       return data;
     },
-    [fireStore, user],
+    [fireStore,books],
   );
 
   const value = useMemo(
@@ -294,8 +268,6 @@ function FireProvider({ children }) {
       books,
       orders,
       loading,
-      mine,
-      setMine,
       login,
       logout,
       signup,
@@ -307,16 +279,14 @@ function FireProvider({ children }) {
       deleteBook,
       booksBySeller,
       purchaseBook,
+      getOrders,
       cancelOrder,
-      ordersForUser,
       relatedBooks,
     }),
     [
       user,
       books,
       orders,
-      mine,
-      setMine,
       login,
       logout,
       signup,
@@ -326,9 +296,9 @@ function FireProvider({ children }) {
       updateBook,
       deleteBook,
       booksBySeller,
+      getOrders,
       purchaseBook,
       cancelOrder,
-      ordersForUser,
       relatedBooks,
     ],
   );

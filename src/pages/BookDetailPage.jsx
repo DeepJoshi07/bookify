@@ -7,32 +7,33 @@ import { useFirebase } from "../context/Firebase";
 
 export default function BookDetailPage() {
   const { id } = useParams();
-  const { user, books, getBook, relatedBooks, purchaseBook } = useFirebase();
+  const { user, books, getBook, getBooks, relatedBooks, purchaseBook } =
+    useFirebase();
   const { pushToast } = useToast();
   const navigate = useNavigate();
   const [book, setBook] = useState(null);
+  const [isBuy, setIsBuy] = useState(false);
+
   useEffect(() => {
-    const getData = async () => {
-      const data = await getBook(id);
-      setBook(data);
-    };
-    getData();
-  }, [getBook]);
+    const data = getBook(id);
+    setBook(data);
+  }, [books, getBooks]);
 
   const [related, setRelated] = useState([]);
+
   useEffect(() => {
-    const getData = async () => {
-      const data = await relatedBooks(id, 4);
-      setRelated(data);
-    };
-    getData();
-  }, [relatedBooks]);
+    const data = relatedBooks(id, 4);
+    setRelated(data);
+  }, [books, getBook]);
 
   if (!id) {
     return <LoadingSpinner label="Missing book" />;
   }
 
   if (!book) {
+    return <LoadingSpinner />;
+  }
+  if (book.length === 0) {
     return (
       <div className="mx-auto max-w-lg px-4 py-20 text-center">
         <h1 className="font-display text-2xl font-bold text-ink-900 dark:text-paper-50">
@@ -55,11 +56,14 @@ export default function BookDetailPage() {
     }
     if (!book) return;
     const getData = async () => {
+      setIsBuy(true);
       const data = await purchaseBook(book.id, user.uid);
       if (data) {
+        setIsBuy(false);
         pushToast("Order placed successfully.", "success");
         navigate(`/orders/${data.id}`);
       } else {
+        setIsBuy(false);
         pushToast("Could not complete purchase.", "error");
       }
     };
@@ -137,7 +141,9 @@ export default function BookDetailPage() {
                   ? "Log in to buy"
                   : book.sellerId === user.id
                     ? "Your listing"
-                    : "Buy now"}
+                    : isBuy
+                      ? "Buying...."
+                      : "Buy Now"}
               </button>
             )}
           </div>

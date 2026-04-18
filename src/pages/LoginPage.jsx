@@ -13,7 +13,7 @@ function validate(email, password) {
 }
 
 export default function LoginPage() {
-  const { login, googleLogin, user } = useFirebase();
+  const { login, googleLogin} = useFirebase();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -31,6 +31,11 @@ export default function LoginPage() {
     } else {
       setErrors({message:"Wrong email or password"});
     }
+  }
+
+  async function handleGoogleLogin(){
+    await googleLogin();
+    navigate("/")
   }
 
   return (
@@ -125,7 +130,7 @@ export default function LoginPage() {
       </div>
 
       <button
-        onClick={googleLogin}
+        onClick={handleGoogleLogin}
         type="button"
         className="focus-ring flex w-full items-center justify-center gap-2 rounded-xl border border-paper-200 bg-white py-3 text-sm font-medium text-ink-800 dark:border-ink-600 dark:bg-ink-800 dark:text-paper-100"
         aria-label="Sign in with Google (demo UI only)"

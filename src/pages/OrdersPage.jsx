@@ -2,45 +2,37 @@ import { Link } from "react-router-dom";
 import { EmptyState } from "@/components/EmptyState.jsx";
 import { useToast } from "@/context/ToastContext.jsx";
 import { useFirebase } from "../context/Firebase";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export default function OrdersPage() {
-  const { user, ordersForUser, getBook, cancelOrder } = useFirebase();
+  const { user,getOrders, getBook, cancelOrder } =
+    useFirebase();
   const { pushToast } = useToast();
   const [list, setList] = useState([]);
-  const [book, setBook] = useState([]);
 
   useEffect(() => {
     const getData = async () => {
-      if (!user) return;
-      const data = await ordersForUser(user.uid);
+      const data = await getOrders();
       setList(data);
     };
     getData();
-  }, [ordersForUser, user]);
+  }, [user,getOrders]);
 
-  useEffect(() => {
-    const getData = async () => {
-      const data = await Promise.all(
-        list.map(async (order) => {
-          const orderData = await getBook(order.bookId);
-          return { ...orderData, orderId: order.id, orderAt: order.orderAt };
-        }),
-      );
-
-      setBook(data);
-    };
-    getData();
+  const book = useMemo(() => {
+    return list.map((order) => {
+      const orderData = getBook(order.bookId);
+      return { ...orderData, orderId: order.id, orderAt: order.orderAt };
+    });
   }, [list, getBook]);
 
   const handleCancelOrder = async (orderId) => {
     if (!user) return;
     await cancelOrder(orderId);
+    const data = await getOrders()
+    setList(data);
     pushToast("Order cancelled.", "success");
-    window.location.reload();
+    // window.location.reload();
   };
-
-
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
@@ -70,10 +62,10 @@ export default function OrdersPage() {
         <ul className="mt-10 space-y-4">
           {book &&
             book.map((order) => {
-              if (!book) return null;
+              // if (!book) return null;
               return (
                 <li
-                  key={order.orderId}
+                  key={order.id}
                   className="flex flex-col gap-4 rounded-2xl border border-paper-200 bg-white p-4 shadow-card sm:flex-row sm:items-center dark:border-ink-700 dark:bg-ink-800 dark:shadow-card-dark"
                 >
                   <img

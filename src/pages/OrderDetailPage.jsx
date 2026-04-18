@@ -1,60 +1,43 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useFirebase } from "../context/Firebase";
+import {LoadingSpinner} from "../components/LoadingSpinner"
 
 export default function OrderDetailPage() {
   const { id } = useParams();
-  const { user, orders, ordersForUser, getBook } = useFirebase();
+  const { user, orders, getBook,getOrders } = useFirebase();
   const [order, setOrder] = useState(null);
   const [book, setBook] = useState(null);
 
   useEffect(() => {
     const getData = async () => {
-      if (!user) return;
-      const data = await ordersForUser(user.uid);
-      setOrder(data);
+      await getOrders();
     };
     getData();
-  }, [ordersForUser, user, id]);
+  }, [user]);
 
   useEffect(() => {
     const data = orders.find((o) => o.id === id);
-    setOrder(data);
+    setOrder(data ?? null);
   }, [orders, id]);
 
-  // console.log(order.bookId);
-
   useEffect(() => {
-    const getData = async () => {
-      if (!user || !order || !order.bookId) return;
-      const data = await getBook(order.bookId);
-      // console.log(data)
-      setBook(data);
-    };
-    getData();
+    if (!user || !order || !order.bookId) return;
+    const data = getBook(order.bookId);
+    setBook(data);
   }, [getBook, user, order]);
-
-  // console.log(book)
 
   const isOwner = user && order && order.userId === user.uid;
 
-  if (!id || !order || !isOwner) {
-    return (
-      <div className="mx-auto max-w-lg px-4 py-20 text-center">
-        <h1 className="font-display text-2xl font-bold text-ink-900 dark:text-paper-50">
-          Order not found
-        </h1>
-        <Link
-          to="/orders"
-          className="mt-4 inline-block text-accent hover:underline"
-        >
-          Back to orders
-        </Link>
-      </div>
-    );
-  }
-
-  if (!book) {
+ 
+  useEffect(() => {
+    const data = orders.find((o) => o.id === id);
+    if(data === undefined){
+      setOrder(null)
+    }
+    setOrder(data);
+  }, [orders, id]);
+  if (book == null) {
     return (
       <div className="mx-auto max-w-lg px-4 py-20 text-center">
         <p className="text-ink-700 dark:text-paper-300">
@@ -67,6 +50,12 @@ export default function OrderDetailPage() {
           Back to orders
         </Link>
       </div>
+    );
+  }
+
+  if (!book) {
+    return (
+      <LoadingSpinner/>
     );
   }
 

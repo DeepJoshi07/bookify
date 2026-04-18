@@ -3,9 +3,20 @@ import { BookCard } from "@/components/BookCard.jsx";
 import { EmptyState } from "@/components/EmptyState.jsx";
 import { useToast } from "@/context/ToastContext.jsx";
 import { useFirebase } from "../context/Firebase";
+import { useEffect, useState } from "react";
 
 export default function ListingsPage() {
-  const {mine, deleteBook  } = useFirebase();
+  const { user, books, deleteBook, addBook } = useFirebase();
+  const [mine, setMine] = useState([]);
+
+  const handleDelete = async (id) => {
+    await deleteBook(id);
+  };
+
+  useEffect(() => {
+    const data = books.filter((b) => b.sellerId === user.uid);
+    setMine(data);
+  }, [books, addBook, deleteBook]);
   const { pushToast } = useToast();
 
   return (
@@ -44,38 +55,38 @@ export default function ListingsPage() {
         </div>
       ) : (
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {mine && mine.map((book) => (
-            <BookCard
-              key={book.id}
-              book={book}
-              showStatus
-              actions={
-                <>
-                  <Link
-                    to={`/listings/${book.id}/edit`}
-                    className="focus-ring rounded-lg border border-paper-200 px-3 py-1.5 text-xs font-medium dark:border-ink-600"
-                  >
-                    Edit
-                  </Link>
-                  <button
-                    type="button"
-                    className="focus-ring rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700 dark:border-red-900 dark:text-red-300"
-                    onClick={() => {
-                      if (confirm(`Delete "${book.title}"?`)) {
-                        deleteBook(book.id);
-                        pushToast("Listing removed.", "success");
-                      }
-                    }}
-                  >
-                    Delete
-                  </button>
-                </>
-              }
-            />
-          ))}
+          {mine &&
+            mine.map((book) => (
+              <BookCard
+                key={book.id}
+                book={book}
+                showStatus
+                actions={
+                  <>
+                    <Link
+                      to={`/listings/${book.id}/edit`}
+                      className="focus-ring rounded-lg border border-paper-200 px-3 py-1.5 text-xs font-medium dark:border-ink-600"
+                    >
+                      Edit
+                    </Link>
+                    <button
+                      type="button"
+                      className="focus-ring rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-700 dark:border-red-900 dark:text-red-300"
+                      onClick={() => {
+                        if (confirm(`Delete "${book.title}"?`)) {
+                          handleDelete(book.id);
+                          pushToast("Listing removed.", "success");
+                        }
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </>
+                }
+              />
+            ))}
         </div>
       )}
     </div>
   );
 }
-

@@ -35,6 +35,11 @@ export default function SignupPage() {
     }
   }
 
+  async function handleGoogleLogin() {
+    await googleLogin();
+    navigate("/");
+  }
+
   return (
     <div className="mx-auto max-w-md px-4 py-16 sm:px-6">
       <h1 className="font-display text-3xl font-bold text-ink-900 dark:text-paper-50">
@@ -154,7 +159,7 @@ export default function SignupPage() {
       </div>
 
       <button
-        onClick={googleLogin}
+        onClick={handleGoogleLogin}
         type="button"
         className="focus-ring flex w-full items-center justify-center gap-2 rounded-xl border border-paper-200 bg-white py-3 text-sm font-medium dark:border-ink-600 dark:bg-ink-800 dark:text-paper-100"
         aria-label="Sign up with Google (demo UI only)"

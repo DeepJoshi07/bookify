@@ -71,7 +71,7 @@ export default function AddEditListingPage() {
     setForm((p) => ({ ...p, coverImage: file }));
   }
 
-  function handleSubmit(ev) {
+  async function handleSubmit(ev) {
     ev.preventDefault();
     if (!user) return;
     const next = validate(form, user.email);
@@ -82,7 +82,7 @@ export default function AddEditListingPage() {
     const sellerEmail = form.email.trim() || user.email;
 
     if (isEdit && id) {
-      updateBook(id, {
+      await updateBook(id, {
         title: form.title.trim(),
         isbn: form.isbn.trim(),
         author: form.author.trim(),
@@ -93,7 +93,7 @@ export default function AddEditListingPage() {
       });
       pushToast("Listing updated.", "success");
     } else {
-      addBook({
+      await addBook({
         title: form.title.trim(),
         isbn: form.isbn.trim(),
         author: form.author.trim(),
