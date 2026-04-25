@@ -1,6 +1,10 @@
 // import { initializeApp } from "firebase/app";
 import {
   onAuthStateChanged,
+  signOut,
+  signInWithPopup,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
 } from "firebase/auth";
 import {
   doc,
