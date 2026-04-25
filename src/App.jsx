@@ -2,7 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { MainLayout } from "@/layouts/MainLayout.jsx";
 import { ProtectedRoute } from "@/components/ProtectedRoute.jsx";
 import { NotFoundPage } from "@/pages/NotFoundPage.jsx";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { LoadingSpinner } from "./components/LoadingSpinner";
 
 const HomePage = lazy(() => import("./pages/HomePage"));

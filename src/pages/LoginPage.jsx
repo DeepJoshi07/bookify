@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useFirebase } from "../context/Firebase";
 
+
 function validate(email, password) {
   const e = {};
   if (!email.trim()) e.email = "Email is required.";
@@ -15,7 +16,6 @@ function validate(email, password) {
 export default function LoginPage() {
   const { login, googleLogin} = useFirebase();
   const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});

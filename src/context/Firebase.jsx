@@ -1,15 +1,8 @@
-import { initializeApp } from "firebase/app";
+// import { initializeApp } from "firebase/app";
 import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithPopup,
-  signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signOut,
   onAuthStateChanged,
 } from "firebase/auth";
 import {
-  getFirestore,
   doc,
   addDoc,
   getDocs,
@@ -23,7 +16,6 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import {
-  getStorage,
   uploadBytes,
   getDownloadURL,
   deleteObject,
@@ -37,22 +29,11 @@ import {
   useMemo,
   useCallback,
 } from "react";
+import {firebaseApp} from "../firebase/FireApp"
+import {fireAuth,GoogleProvider} from "../firebase/FireAuth"
+import {fireStore} from "../firebase/FireStore"
+import {fireStorage} from "../firebase/FireStorage"
 
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_API_KEY,
-  authDomain: import.meta.env.VITE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_APP_ID,
-};
-
-// Initialize Firebase
-const firebaseApp = initializeApp(firebaseConfig);
-const fireAuth = getAuth(firebaseApp);
-const fireStore = getFirestore(firebaseApp);
-const fireStorage = getStorage(firebaseApp);
-const GoogleProvider = new GoogleAuthProvider();
 
 const FireContext = createContext();
 
@@ -64,7 +45,6 @@ function FireProvider({ children }) {
   const [books, setBooks] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-
 
 
   const signup = async (email, password) => {
